@@ -38,18 +38,18 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
-      {/* Hero Banner */}
+      {/* PitchScore Hero Banner */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="max-w-2xl space-y-3">
           <div className="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
             <Activity size={14} />
-            <span>Private Football Match & Stats Platform</span>
+            <span>Welcome to PitchScore</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-            Track Matches, Calculate Ratings & Build Player History
+            PitchScore — Local Football Match Scorer & Stats Tracker
           </h1>
           <p className="text-slate-600 text-sm leading-relaxed">
-            Record raw turf match events. Share 6-digit match codes with friends, automatically derive match scores and player ratings, and maintain career leaderboards.
+            Record raw match events. Share 6-digit match join codes with friends, automatically derive match scores and player ratings, and build career leaderboards.
           </p>
           
           <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -108,7 +108,7 @@ export default function Dashboard() {
             ))
           ) : (
             <div className="col-span-full bg-white rounded-xl p-8 text-center text-slate-500 border border-slate-200 shadow-sm text-sm">
-              No completed matches recorded yet. Click <strong>Create New Match</strong> above to host your first game!
+              No completed matches recorded yet. Click <strong>Create New Match</strong> above to host your first game on PitchScore!
             </div>
           )}
         </div>
