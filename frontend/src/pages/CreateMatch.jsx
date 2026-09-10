@@ -75,7 +75,8 @@ export default function CreateMatch() {
       setCreatedMatch(res.data);
     } catch (err) {
       console.error(err);
-      alert('Failed to create match');
+      const errMsg = err.response?.data?.message || err.message || 'Failed to connect to backend server';
+      alert(`Could not create match: ${errMsg}`);
     } finally {
       setSubmitting(false);
     }
