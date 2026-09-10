@@ -41,8 +41,8 @@ export default function Navbar() {
           
           {/* PitchScore Logo */}
           <Link to="/" className="flex items-center space-x-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm font-bold group-hover:bg-emerald-700 transition-colors">
-              <Shield size={20} className="fill-current" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm font-black text-sm tracking-wider group-hover:bg-emerald-700 transition-colors">
+              PS
             </div>
             <div>
               <span className="font-bold text-lg text-slate-900 tracking-tight block leading-none font-['Inter']">PitchScore</span>
@@ -85,7 +85,7 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs">
                 <div className="px-2.5 py-1 text-slate-700 font-medium flex items-center space-x-1.5">
-                  <Shield size={13} className="text-emerald-600" />
+                  <UserCheck size={13} className="text-emerald-600" />
                   <span className="truncate max-w-[100px] font-semibold">{user.name}</span>
                   <span className={`px-1.5 py-0.2 text-[9px] rounded uppercase font-bold ${isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
                     {user.role}

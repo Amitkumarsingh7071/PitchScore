@@ -9,17 +9,17 @@ import {
   finishMatch, 
   deleteMatch 
 } from '../controllers/matchController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, optionalAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.get('/', getMatches);
 router.get('/code/:code', getMatchByCode);
 router.get('/:id', getMatchById);
-router.post('/', protect, createMatch);
-router.post('/join-code', protect, joinMatchByCode);
-router.put('/:id', protect, updateMatch);
-router.post('/:id/finish', protect, finishMatch);
-router.delete('/:id', protect, deleteMatch);
+router.post('/', optionalAuth, createMatch);
+router.post('/join-code', optionalAuth, joinMatchByCode);
+router.put('/:id', optionalAuth, updateMatch);
+router.post('/:id/finish', optionalAuth, finishMatch);
+router.delete('/:id', optionalAuth, deleteMatch);
 
 export default router;
