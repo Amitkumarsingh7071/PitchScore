@@ -4,21 +4,38 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 let mongoServer = null;
 
 export const connectDB = async () => {
-  const localUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/football_memory';
+  const mongoUri = process.env.MONGO_URI;
+
+  if (mongoUri) {
+    try {
+      await mongoose.connect(mongoUri);
+      console.log(`MongoDB Connected: ${mongoose.connection.host}`);
+      return;
+    } catch (err) {
+      console.error(`MongoDB Atlas connection error: ${err.message}`);
+      process.exit(1);
+    }
+  }
+
+  // Fallback for local development if MONGO_URI is not set
+  const localUri = 'mongodb://127.0.0.1:27017/pitchscore';
 
   try {
-    // Attempt connecting to local MongoDB first
     await mongoose.connect(localUri, {
       serverSelectionTimeoutMS: 2000,
     });
-    console.log(`MongoDB Connected: ${mongoose.connection.host}`);
+    console.log(`Local MongoDB Connected: ${mongoose.connection.host}`);
   } catch (err) {
     console.log('Local MongoDB connection failed. Starting embedded MongoMemoryServer fallback...');
     try {
-      mongoServer = await MongoMemoryServer.create();
-      const mongoUri = mongoServer.getUri();
-      await mongoose.connect(mongoUri);
-      console.log(`Embedded MongoDB Memory Server connected at ${mongoUri}`);
+      mongoServer = await MongoMemoryServer.create({
+        binary: {
+          version: '7.0.3'
+        }
+      });
+      const memoryUri = mongoServer.getUri();
+      await mongoose.connect(memoryUri);
+      console.log(`Embedded MongoDB Memory Server connected at ${memoryUri}`);
     } catch (memErr) {
       console.error('Failed to start MongoMemoryServer:', memErr.message);
       process.exit(1);

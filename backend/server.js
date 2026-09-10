@@ -26,9 +26,25 @@ app.use('/api/matches', matchRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/stats', statsRoutes);
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Healthcheck
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', app: 'Football Memory API', time: new Date() });
+  res.json({ status: 'ok', app: 'PitchScore API', time: new Date() });
+});
+
+// Serve static frontend in production if built
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendDistPath));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(frontendDistPath, 'index.html'), (err) => {
+    if (err) next();
+  });
 });
 
 // Start Server & Connect DB
@@ -42,7 +58,7 @@ const startServer = async () => {
   }
 
   app.listen(PORT, () => {
-    console.log(`⚽ Football Memory Backend API running on port ${PORT}`);
+    console.log(`⚽ PitchScore Backend API running on port ${PORT}`);
   });
 };
 
