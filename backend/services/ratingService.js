@@ -28,21 +28,34 @@ export const calculatePlayerMatchRating = ({
   let penaltySaves = 0;
   let yellowCards = 0;
   let redCards = 0;
+  let ownGoals = 0;
 
   events.forEach(e => {
     const isPrimary = e.playerId && getCleanId(e.playerId) === playerStr;
-    const isSecondaryAssister = e.secondaryPlayerId && getCleanId(e.secondaryPlayerId) === playerStr;
+    const isSecondary = e.secondaryPlayerId && getCleanId(e.secondaryPlayerId) === playerStr;
 
-    if (e.type === 'goal' && isPrimary) goals += 1;
-    if (e.type === 'assist' && isPrimary) assists += 1;
-    if (e.type === 'goal' && isSecondaryAssister) assists += 1;
-    if (e.type === 'key_pass' && isPrimary) keyPasses += (e.value || 1);
-    if (e.type === 'tackle' && isPrimary) tackles += (e.value || 1);
-    if (e.type === 'interception' && isPrimary) interceptions += (e.value || 1);
-    if (e.type === 'save' && isPrimary) saves += (e.value || 1);
-    if (e.type === 'penalty_save' && isPrimary) penaltySaves += (e.value || 1);
-    if (e.type === 'yellow_card' && isPrimary) yellowCards += 1;
-    if (e.type === 'red_card' && isPrimary) redCards += 1;
+    if (e.type === 'goal') {
+      if (isPrimary) goals += 1;
+      if (isSecondary) assists += 1;
+    } else if (e.type === 'assist') {
+      if (isPrimary && !e.secondaryPlayerId) assists += 1;
+    } else if (e.type === 'key_pass' && isPrimary) {
+      keyPasses += (e.value || 1);
+    } else if (e.type === 'tackle' && isPrimary) {
+      tackles += (e.value || 1);
+    } else if (e.type === 'interception' && isPrimary) {
+      interceptions += (e.value || 1);
+    } else if (e.type === 'save' && isPrimary) {
+      saves += (e.value || 1);
+    } else if (e.type === 'penalty_save' && isPrimary) {
+      penaltySaves += (e.value || 1);
+    } else if (e.type === 'yellow_card' && isPrimary) {
+      yellowCards += 1;
+    } else if (e.type === 'red_card' && isPrimary) {
+      redCards += 1;
+    } else if (e.type === 'own_goal' && isPrimary) {
+      ownGoals += 1;
+    }
   });
 
   const goalPts = goals * (RATING_WEIGHTS.GOAL * (posBonus.GOAL || 1.0));
@@ -54,6 +67,7 @@ export const calculatePlayerMatchRating = ({
   const penaltySavePts = penaltySaves * (RATING_WEIGHTS.PENALTY_SAVE * (posBonus.PENALTY_SAVE || 1.0));
   const yellowPts = yellowCards * RATING_WEIGHTS.YELLOW_CARD;
   const redPts = redCards * RATING_WEIGHTS.RED_CARD;
+  const ownGoalPts = ownGoals * (RATING_WEIGHTS.OWN_GOAL || -0.8);
 
   let cleanSheetPts = 0;
   if (teamGoalsConceded === 0 && minutesPlayed >= 30) {
@@ -68,7 +82,7 @@ export const calculatePlayerMatchRating = ({
 
   let resultPts = RATING_WEIGHTS.RESULT_BONUS[result] || 0;
 
-  const rawScore = 
+  const scoreDelta = 
     goalPts + 
     assistPts + 
     keyPassPts + 
@@ -78,11 +92,12 @@ export const calculatePlayerMatchRating = ({
     penaltySavePts + 
     yellowPts + 
     redPts + 
+    ownGoalPts +
     cleanSheetPts + 
     concededPenaltyPts + 
     resultPts;
 
-  let baseRating = RATING_WEIGHTS.BASE_RATING + (rawScore * 0.75);
+  let baseRating = RATING_WEIGHTS.BASE_RATING + scoreDelta;
 
   const minRatio = Math.min(1.0, Math.max(0.1, minutesPlayed / totalMatchDuration));
   if (minRatio < 0.3) {
@@ -92,7 +107,7 @@ export const calculatePlayerMatchRating = ({
   const finalRating = Math.max(RATING_WEIGHTS.MIN_RATING, Math.min(RATING_WEIGHTS.MAX_RATING, baseRating));
 
   return {
-    rawScore: Number(rawScore.toFixed(2)),
+    rawScore: Number(scoreDelta.toFixed(2)),
     rating: Number(finalRating.toFixed(1)),
     stats: {
       goals,
@@ -104,6 +119,7 @@ export const calculatePlayerMatchRating = ({
       penaltySaves,
       yellowCards,
       redCards,
+      ownGoals,
       minutesPlayed
     }
   };

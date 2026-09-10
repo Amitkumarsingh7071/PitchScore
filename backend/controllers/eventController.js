@@ -30,19 +30,6 @@ export const addMatchEvent = async (req, res) => {
       details: details || ''
     });
 
-    // If goal event with secondary player, also record assist event for explicit tracking
-    if (type === 'goal' && secondaryPlayerId) {
-      await MatchEvent.create({
-        matchId,
-        type: 'assist',
-        minute: minute || 0,
-        playerId: secondaryPlayerId,
-        secondaryPlayerId: playerId,
-        value: 1,
-        details: 'Assisted goal'
-      });
-    }
-
     // Return updated live match details
     const updatedDetails = await calculateMatchDetails(matchId);
     res.status(201).json({ event, matchDetails: updatedDetails });
