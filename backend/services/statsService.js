@@ -4,16 +4,12 @@ import Player from '../models/Player.js';
 import { calculatePlayerMatchRating } from './ratingService.js';
 import { selectManOfTheMatch } from './motmService.js';
 
-/**
- * Calculates complete match results, scores, ratings, and MOTM for a given match.
- */
 export const calculateMatchDetails = async (matchId) => {
   const match = await Match.findById(matchId).populate('teamA.playerIds teamB.playerIds');
   if (!match) throw new Error('Match not found');
 
   const events = await MatchEvent.find({ matchId });
 
-  // 1. Calculate Score
   let scoreA = 0;
   let scoreB = 0;
 
@@ -30,7 +26,6 @@ export const calculateMatchDetails = async (matchId) => {
 
   const score = { teamA: scoreA, teamB: scoreB };
 
-  // 2. Determine match outcome for teams
   let teamAResult = 'DRAW';
   let teamBResult = 'DRAW';
   if (scoreA > scoreB) {
@@ -41,16 +36,13 @@ export const calculateMatchDetails = async (matchId) => {
     teamBResult = 'WIN';
   }
 
-  // Helper to find player minutes
   const getPlayerMinutes = (pId, playerMinutesArray, duration = 90) => {
     const record = (playerMinutesArray || []).find(m => m.playerId && m.playerId.toString() === pId.toString());
     return record ? record.minutesPlayed : duration;
   };
 
-  // 3. Calculate Player Performance Ratings
   const playerPerformances = [];
 
-  // Process Team A
   (match.teamA.playerIds || []).forEach(player => {
     const mins = getPlayerMinutes(player._id, match.teamA.playerMinutes, match.duration);
     const perf = calculatePlayerMatchRating({
@@ -70,7 +62,6 @@ export const calculateMatchDetails = async (matchId) => {
     });
   });
 
-  // Process Team B
   (match.teamB.playerIds || []).forEach(player => {
     const mins = getPlayerMinutes(player._id, match.teamB.playerMinutes, match.duration);
     const perf = calculatePlayerMatchRating({
@@ -90,7 +81,6 @@ export const calculateMatchDetails = async (matchId) => {
     });
   });
 
-  // 4. Determine MOTM
   const motm = selectManOfTheMatch(playerPerformances);
   const motmPlayerId = motm ? motm.player._id : null;
 
@@ -107,7 +97,7 @@ export const calculateMatchDetails = async (matchId) => {
 };
 
 /**
- * Calculates dynamic career stats for a single player by aggregating across all completed matches and events.
+ * Calculates dynamic career stats and CricHeroes-style achievement badges for a player.
  */
 export const calculatePlayerCareerStats = async (playerId) => {
   const player = await Player.findById(playerId);
@@ -121,6 +111,7 @@ export const calculatePlayerCareerStats = async (playerId) => {
   let matchesPlayed = matches.length;
   let goals = 0;
   let assists = 0;
+  let saves = 0;
   let motmCount = 0;
   let wins = 0;
   let draws = 0;
@@ -130,24 +121,36 @@ export const calculatePlayerCareerStats = async (playerId) => {
   let totalRatingSum = 0;
   let highestRating = 0;
 
+  let maxGoalsInSingleMatch = 0;
+  let maxAssistsInSingleMatch = 0;
+  let maxSavesInSingleMatch = 0;
+
   const matchHistory = [];
   const performanceTrend = [];
 
   for (const match of matches) {
     const details = await calculateMatchDetails(match._id);
     
-    // Find player performance in this match
     const perf = details.playerPerformances.find(
       p => p.player._id.toString() === playerId.toString()
     );
 
     if (perf) {
-      goals += perf.stats.goals;
-      assists += perf.stats.assists;
+      const matchGoals = perf.stats.goals || 0;
+      const matchAssists = perf.stats.assists || 0;
+      const matchSaves = perf.stats.saves || 0;
+
+      goals += matchGoals;
+      assists += matchAssists;
+      saves += matchSaves;
       yellowCards += perf.stats.yellowCards;
       redCards += perf.stats.redCards;
       totalRatingSum += perf.rating;
+      
       if (perf.rating > highestRating) highestRating = perf.rating;
+      if (matchGoals > maxGoalsInSingleMatch) maxGoalsInSingleMatch = matchGoals;
+      if (matchAssists > maxAssistsInSingleMatch) maxAssistsInSingleMatch = matchAssists;
+      if (matchSaves > maxSavesInSingleMatch) maxSavesInSingleMatch = matchSaves;
 
       if (details.motmPlayerId && details.motmPlayerId.toString() === playerId.toString()) {
         motmCount += 1;
@@ -160,6 +163,7 @@ export const calculatePlayerCareerStats = async (playerId) => {
       matchHistory.push({
         matchId: match._id,
         matchNumber: match.matchNumber,
+        matchCode: match.matchCode,
         date: match.date,
         location: match.location,
         teamA: match.teamA.name,
@@ -175,8 +179,8 @@ export const calculatePlayerCareerStats = async (playerId) => {
         date: new Date(match.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         matchNumber: `Match #${match.matchNumber || matchHistory.length}`,
         rating: perf.rating,
-        goals: perf.stats.goals,
-        assists: perf.stats.assists
+        goals: matchGoals,
+        assists: matchAssists
       });
     }
   }
@@ -186,12 +190,31 @@ export const calculatePlayerCareerStats = async (playerId) => {
   const assistsPerMatch = matchesPlayed > 0 ? Number((assists / matchesPlayed).toFixed(2)) : 0;
   const winPercentage = matchesPlayed > 0 ? Number(((wins / matchesPlayed) * 100).toFixed(1)) : 0;
 
+  // Compute CricHeroes-style Badges
+  const badges = [];
+  if (maxGoalsInSingleMatch >= 3) {
+    badges.push({ id: 'hat_trick', icon: '🎩', title: 'Hat-Trick Hero', desc: 'Scored 3+ goals in a single match' });
+  }
+  if (maxAssistsInSingleMatch >= 2) {
+    badges.push({ id: 'master_playmaker', icon: '🎯', title: 'Master Playmaker', desc: 'Provided 2+ assists in a single match' });
+  }
+  if (maxSavesInSingleMatch >= 5 || (player.position === 'Goalkeeper' && matchesPlayed >= 1)) {
+    badges.push({ id: 'brick_wall', icon: '🧤', title: 'Brick Wall', desc: 'Made 5+ saves or maintained a clean sheet' });
+  }
+  if (motmCount >= 1) {
+    badges.push({ id: 'turf_mvp', icon: '🏆', title: 'Turf MVP', desc: 'Awarded Man of the Match trophy' });
+  }
+  if (averageRating >= 8.0 && matchesPlayed >= 1) {
+    badges.push({ id: 'elite_performer', icon: '⭐', title: 'Elite Rating', desc: 'Maintains an average rating of 8.0+' });
+  }
+
   return {
     player,
     careerStats: {
       matchesPlayed,
       goals,
       assists,
+      saves,
       motmCount,
       wins,
       draws,
@@ -202,16 +225,14 @@ export const calculatePlayerCareerStats = async (playerId) => {
       highestRating,
       goalsPerMatch,
       assistsPerMatch,
-      winPercentage
+      winPercentage,
+      badges
     },
     matchHistory,
     performanceTrend
   };
 };
 
-/**
- * Calculates complete global leaderboards dynamically from events and completed matches.
- */
 export const calculateLeaderboards = async () => {
   const players = await Player.find();
   const playerStatsList = [];
@@ -224,26 +245,23 @@ export const calculateLeaderboards = async () => {
     });
   }
 
-  const topScorers = [...playerStatsList].sort((a, b) => b.goals - a.goals || b.goalsPerMatch - a.goalsPerMatch);
+  const goldenBoot = [...playerStatsList].sort((a, b) => b.goals - a.goals || b.goalsPerMatch - a.goalsPerMatch);
+  const goldenGlove = [...playerStatsList].sort((a, b) => b.saves - a.saves || b.averageRating - a.averageRating);
   const topAssists = [...playerStatsList].sort((a, b) => b.assists - a.assists || b.assistsPerMatch - a.assistsPerMatch);
   const mostMotm = [...playerStatsList].sort((a, b) => b.motmCount - a.motmCount || b.averageRating - a.averageRating);
   const highestAvgRating = [...playerStatsList].filter(p => p.matchesPlayed > 0).sort((a, b) => b.averageRating - a.averageRating);
   const mostWins = [...playerStatsList].sort((a, b) => b.wins - a.wins || b.winPercentage - a.winPercentage);
-  const bestSingleMatch = [...playerStatsList].filter(p => p.matchesPlayed > 0).sort((a, b) => b.highestRating - a.highestRating);
 
   return {
-    topScorers,
+    topScorers: goldenBoot,
+    goldenGlove,
     topAssists,
     mostMotm,
     highestAvgRating,
-    mostWins,
-    bestSingleMatch
+    mostWins
   };
 };
 
-/**
- * Calculates overall dashboard summary statistics.
- */
 export const calculateDashboardStats = async () => {
   const totalMatches = await Match.countDocuments({ status: 'FINISHED' });
   const totalPlayers = await Player.countDocuments();
@@ -260,7 +278,6 @@ export const calculateDashboardStats = async () => {
     totalGoals += (details.score.teamA + details.score.teamB);
     if (details.motmPlayerId) totalMotm += 1;
 
-    // Count assists from events
     details.events.forEach(e => {
       if (e.type === 'assist' || (e.type === 'goal' && e.secondaryPlayerId)) totalAssists += 1;
     });
@@ -268,11 +285,13 @@ export const calculateDashboardStats = async () => {
     matchSummaries.push({
       _id: match._id,
       matchNumber: match.matchNumber,
+      matchCode: match.matchCode,
       date: match.date,
       location: match.location,
       teamA: match.teamA.name,
       teamB: match.teamB.name,
       score: details.score,
+      status: match.status,
       motm: details.motm ? {
         _id: details.motm.player._id,
         name: details.motm.player.name,
@@ -296,9 +315,9 @@ export const calculateDashboardStats = async () => {
     leaderboardPreview: {
       topScorer: leaderboards.topScorers[0] || null,
       topAssists: leaderboards.topAssists[0] || null,
+      goldenGlove: leaderboards.goldenGlove[0] || null,
       mostMotm: leaderboards.mostMotm[0] || null,
-      highestAvgRating: leaderboards.highestAvgRating[0] || null,
-      mostWins: leaderboards.mostWins[0] || null
+      highestAvgRating: leaderboards.highestAvgRating[0] || null
     }
   };
 };

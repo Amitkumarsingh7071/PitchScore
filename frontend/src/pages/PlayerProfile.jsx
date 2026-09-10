@@ -14,7 +14,8 @@ import {
   CheckCircle,
   XCircle,
   MinusCircle,
-  ArrowLeft
+  ArrowLeft,
+  Flame
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -64,18 +65,19 @@ export default function PlayerProfile() {
   }
 
   const { player, careerStats, matchHistory, performanceTrend } = data;
+  const badges = careerStats.badges || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
       
       {/* Back Link */}
-      <Link to="/players" className="inline-flex items-center space-x-2 text-xs font-bold text-slate-400 hover:text-emerald-400">
+      <Link to="/players" className="inline-flex items-center space-x-2 text-xs font-black text-slate-400 hover:text-emerald-400 uppercase tracking-wider">
         <ArrowLeft size={16} />
-        <span>Back to Players</span>
+        <span>Back to Players Directory</span>
       </Link>
 
       {/* Profile Header Banner */}
-      <div className="relative rounded-3xl overflow-hidden glass-panel border border-slate-800 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="relative rounded-3xl overflow-hidden glass-panel border border-slate-800 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
           <div className="relative">
             <img
@@ -83,15 +85,15 @@ export default function PlayerProfile() {
               alt={player.name}
               className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-emerald-500/40 shadow-2xl"
             />
-            <span className="absolute -bottom-2 -right-2 bg-emerald-500 text-black font-black text-sm px-2 py-0.5 rounded-lg shadow">
+            <span className="absolute -bottom-2 -right-2 bg-emerald-500 text-black font-black text-sm px-2.5 py-0.5 rounded-lg shadow">
               #{player.jerseyNumber || 10}
             </span>
           </div>
 
           <div>
-            <h1 className="text-3xl font-black text-white">{player.name}</h1>
+            <h1 className="text-3xl font-black text-white font-['Plus_Jakarta_Sans']">{player.name}</h1>
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full text-xs font-extrabold uppercase">
+              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full text-xs font-black uppercase">
                 {player.position}
               </span>
               <span className="bg-slate-800 text-slate-300 px-3 py-1 rounded-full text-xs font-bold">
@@ -107,16 +109,16 @@ export default function PlayerProfile() {
         </div>
 
         {/* Rating & MOTM Quick Highlights */}
-        <div className="flex items-center space-x-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+        <div className="flex items-center space-x-4 bg-slate-950/90 p-4 rounded-2xl border border-slate-800">
           <div className="text-center px-4">
-            <div className="text-[10px] font-bold text-slate-400 uppercase">Avg Rating</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase">Avg Rating</div>
             <div className="text-2xl font-black text-amber-400 mt-1 flex items-center justify-center gap-1">
               <Star size={18} fill="currentColor" /> {careerStats.averageRating}
             </div>
           </div>
           <div className="h-10 border-r border-slate-800" />
           <div className="text-center px-4">
-            <div className="text-[10px] font-bold text-slate-400 uppercase">MOTMs</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase">MOTMs</div>
             <div className="text-2xl font-black text-amber-300 mt-1 flex items-center justify-center gap-1">
               <Trophy size={18} /> {careerStats.motmCount}
             </div>
@@ -124,11 +126,31 @@ export default function PlayerProfile() {
         </div>
       </div>
 
+      {/* CricHeroes Achievement Badges Showcase */}
+      {badges.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+            <Flame className="text-amber-400" size={18} />
+            <span>Unlocked FootHeroes Achievements ({badges.length})</span>
+          </h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {badges.map(badge => (
+              <div key={badge.id} className="bg-slate-900/90 border border-slate-700/80 p-3 rounded-2xl text-center space-y-1 shadow-lg">
+                <div className="text-3xl">{badge.icon}</div>
+                <div className="font-extrabold text-white text-xs">{badge.title}</div>
+                <div className="text-[10px] text-slate-400 leading-tight">{badge.desc}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Automatically Derived Career Statistics */}
       <section className="space-y-4">
         <h2 className="text-lg font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
           <ShieldCheck className="text-emerald-400" size={20} />
-          <span>Derived Career Statistics</span>
+          <span>Derived Turf Career Statistics</span>
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -147,7 +169,7 @@ export default function PlayerProfile() {
           
           {/* Rating Trend Chart */}
           <div className="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
               <TrendingUp size={16} className="text-emerald-400" />
               <span>Match Rating History</span>
             </h3>
@@ -173,7 +195,7 @@ export default function PlayerProfile() {
 
           {/* Goals & Assists Chart */}
           <div className="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
               <Target size={16} className="text-teal-400" />
               <span>Goals & Assists per Match</span>
             </h3>
@@ -205,7 +227,7 @@ export default function PlayerProfile() {
         <div className="glass-panel rounded-3xl overflow-hidden border border-slate-800">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-900/80 uppercase text-[10px] font-extrabold text-slate-400 border-b border-slate-800">
+              <thead className="bg-slate-900/80 uppercase text-[10px] font-black text-slate-400 border-b border-slate-800">
                 <tr>
                   <th className="p-4">Match</th>
                   <th className="p-4">Date</th>
@@ -218,10 +240,10 @@ export default function PlayerProfile() {
               <tbody className="divide-y divide-slate-800/60">
                 {matchHistory.map((m) => (
                   <tr key={m.matchId} className="hover:bg-slate-800/40 transition">
-                    <td className="p-4 font-bold text-white">Match #{m.matchNumber}</td>
+                    <td className="p-4 font-bold text-white">Match #{m.matchNumber} ({m.matchCode})</td>
                     <td className="p-4 text-slate-400">{new Date(m.date).toLocaleDateString()}</td>
                     <td className="p-4 font-semibold">
-                      {m.teamA} <span className="text-emerald-400 font-extrabold">{m.score.teamA} - {m.score.teamB}</span> {m.teamB}
+                      {m.teamA} <span className="text-emerald-400 font-black">{m.score.teamA} - {m.score.teamB}</span> {m.teamB}
                     </td>
                     <td className="p-4">
                       {m.result === 'WIN' && (

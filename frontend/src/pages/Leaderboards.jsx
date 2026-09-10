@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { statsAPI } from '../services/api';
-import { Trophy, Target, Award, Star, CheckCircle, Flame } from 'lucide-react';
+import { Trophy, Target, Award, Star, CheckCircle, Flame, Shield } from 'lucide-react';
 
 export default function Leaderboards() {
   const [data, setData] = useState(null);
@@ -30,15 +30,15 @@ export default function Leaderboards() {
     );
   }
 
-  const { topScorers, topAssists, mostMotm, highestAvgRating, mostWins, bestSingleMatch } = data || {};
+  const { topScorers, goldenGlove, topAssists, mostMotm, highestAvgRating, mostWins } = data || {};
 
   const tabs = [
-    { id: 'scorers', label: '⚽ Top Scorers', data: topScorers, keyName: 'Goals', keyVal: (p) => p.goals },
-    { id: 'assists', label: '🎯 Top Assists', data: topAssists, keyName: 'Assists', keyVal: (p) => p.assists },
-    { id: 'motm', label: '🏆 Most MOTM', data: mostMotm, keyName: 'MOTM Awards', keyVal: (p) => p.motmCount },
-    { id: 'rating', label: '⭐ Highest Avg Rating', data: highestAvgRating, keyName: 'Avg Rating', keyVal: (p) => `${p.averageRating} ⭐` },
-    { id: 'wins', label: '✅ Most Wins', data: mostWins, keyName: 'Wins', keyVal: (p) => `${p.wins} (${p.winPercentage}%)` },
-    { id: 'single', label: '🔥 Best Match Rating', data: bestSingleMatch, keyName: 'Peak Rating', keyVal: (p) => `${p.highestRating} ⭐` },
+    { id: 'scorers', label: '⚽ Golden Boot', data: topScorers, keyName: 'Goals', keyVal: (p) => `${p.goals} Goals` },
+    { id: 'glove', label: '🧤 Golden Glove', data: goldenGlove, keyName: 'Saves', keyVal: (p) => `${p.saves} Saves` },
+    { id: 'assists', label: '🎯 Master Playmaker', data: topAssists, keyName: 'Assists', keyVal: (p) => `${p.assists} Assists` },
+    { id: 'motm', label: '🏆 Turf MVP', data: mostMotm, keyName: 'MOTMs', keyVal: (p) => `${p.motmCount} MOTMs` },
+    { id: 'rating', label: '⭐ Highest Rating', data: highestAvgRating, keyName: 'Avg Rating', keyVal: (p) => `${p.averageRating} ⭐` },
+    { id: 'wins', label: '✅ Most Turf Wins', data: mostWins, keyName: 'Wins', keyVal: (p) => `${p.wins} Wins (${p.winPercentage}%)` },
   ];
 
   const currentTab = tabs.find(t => t.id === activeTab);
@@ -48,12 +48,12 @@ export default function Leaderboards() {
       
       {/* Header */}
       <div className="border-b border-slate-800 pb-6">
-        <h1 className="text-3xl font-black text-white flex items-center gap-3">
+        <h1 className="text-3xl font-black text-white flex items-center gap-3 font-['Plus_Jakarta_Sans']">
           <Trophy className="text-amber-400" size={32} />
-          <span>Group Leaderboards</span>
+          <span>FootHeroes Turf Leaderboards</span>
         </h1>
         <p className="text-slate-400 text-sm mt-1">
-          Automatically ranked player statistics calculated from all completed match events
+          Automatically ranked player statistics calculated from all completed turf match events
         </p>
       </div>
 
@@ -63,9 +63,9 @@ export default function Leaderboards() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all ${
               activeTab === tab.id
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-black shadow-lg'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow-lg'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
             }`}
           >
@@ -78,7 +78,7 @@ export default function Leaderboards() {
       <div className="glass-panel rounded-3xl overflow-hidden border border-slate-800 shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-900/90 uppercase text-[10px] font-extrabold text-slate-400 border-b border-slate-800">
+            <thead className="bg-slate-900/90 uppercase text-[10px] font-black text-slate-400 border-b border-slate-800">
               <tr>
                 <th className="p-4 w-16 text-center">Rank</th>
                 <th className="p-4">Player</th>
@@ -90,7 +90,6 @@ export default function Leaderboards() {
             <tbody className="divide-y divide-slate-800/60">
               {currentTab?.data?.map((p, idx) => {
                 const rank = idx + 1;
-                const isTop3 = rank <= 3;
 
                 return (
                   <tr key={p.player._id} className="hover:bg-slate-800/40 transition">
@@ -109,7 +108,7 @@ export default function Leaderboards() {
                           className="w-10 h-10 rounded-xl object-cover border border-slate-700 group-hover:border-emerald-500 transition"
                         />
                         <div>
-                          <div className="font-extrabold text-white group-hover:text-emerald-400 transition text-sm">
+                          <div className="font-black text-white group-hover:text-emerald-400 transition text-sm">
                             {p.player.name}
                           </div>
                           <div className="text-[10px] text-slate-400">#{p.player.jerseyNumber || 10}</div>
