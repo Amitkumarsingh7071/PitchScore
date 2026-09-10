@@ -13,16 +13,20 @@ import MatchDetail from './pages/MatchDetail';
 import MatchHistory from './pages/MatchHistory';
 import Memories from './pages/Memories';
 import Leaderboards from './pages/Leaderboards';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen flex flex-col bg-[#080d1a] text-slate-100 selection:bg-emerald-500 selection:text-black font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 selection:bg-emerald-600 selection:text-white font-['Inter',sans-serif]">
           <Navbar />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route path="/join" element={<JoinMatch />} />
               <Route path="/players" element={<Players />} />
               <Route path="/players/:id" element={<PlayerProfile />} />

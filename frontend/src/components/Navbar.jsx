@@ -11,10 +11,12 @@ import {
   ShieldAlert, 
   UserCheck, 
   LogOut,
+  LogIn,
   Menu,
   X,
   Home,
-  Activity
+  Activity,
+  User
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -80,48 +82,44 @@ export default function Navbar() {
               <span>Create Match</span>
             </Link>
 
-            {/* Quick Role Switcher */}
-            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-1 text-xs">
-              <button
-                onClick={quickLoginAdmin}
-                className={`px-2.5 py-1 rounded-md font-medium transition-colors flex items-center space-x-1 ${
-                  isAdmin ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-800'
-                }`}
-                title="Switch to Host role"
-              >
-                <ShieldAlert size={12} />
-                <span>Host</span>
-              </button>
-              <button
-                onClick={quickLoginPlayer}
-                className={`px-2.5 py-1 rounded-md font-medium transition-colors flex items-center space-x-1 ${
-                  !isAdmin && user ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-800'
-                }`}
-                title="Switch to Player role"
-              >
-                <UserCheck size={12} />
-                <span>Player</span>
-              </button>
-            </div>
-
-            {user && (
-              <button
-                onClick={logout}
-                className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
-                title="Logout"
-              >
-                <LogOut size={16} />
-              </button>
+            {/* User Account / Sign In Status */}
+            {user ? (
+              <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs">
+                <div className="px-2.5 py-1 text-slate-700 font-medium flex items-center space-x-1.5">
+                  <User size={13} className="text-emerald-600" />
+                  <span className="truncate max-w-[100px] font-semibold">{user.name}</span>
+                  <span className={`px-1.5 py-0.2 text-[9px] rounded uppercase font-bold ${isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
+                    {user.role}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-200 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut size={14} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link
+                  to="/login"
+                  className="flex items-center space-x-1 border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold px-3 py-2 rounded-lg text-xs transition-colors"
+                >
+                  <LogIn size={14} />
+                  <span>Sign In</span>
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center space-x-2">
             <Link
-              to="/join"
-              className="bg-emerald-600 text-white p-2 rounded-lg font-semibold flex items-center justify-center"
+              to="/login"
+              className="bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-lg font-semibold flex items-center justify-center text-xs"
             >
-              <KeyRound size={16} />
+              <LogIn size={16} />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -156,13 +154,20 @@ export default function Navbar() {
             );
           })}
 
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col space-y-2">
             <Link
               to="/create-match"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-center block text-xs"
             >
               + Create New Match
+            </Link>
+            <Link
+              to="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full bg-slate-100 text-slate-700 font-semibold py-2 rounded-lg text-center block text-xs border border-slate-200"
+            >
+              Sign In / Account
             </Link>
           </div>
         </div>
