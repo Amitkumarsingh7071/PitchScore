@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldAlert, Award, AlertTriangle, RefreshCw, Plus } from 'lucide-react';
+import { X, Activity } from 'lucide-react';
 
 export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent }) {
   const [eventType, setEventType] = useState('goal');
@@ -12,7 +12,6 @@ export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent })
 
   if (!isOpen || !match) return null;
 
-  // Combine all match players
   const allPlayers = [
     ...(match.teamA?.playerIds || []),
     ...(match.teamB?.playerIds || [])
@@ -33,7 +32,6 @@ export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent })
         value: Number(value),
         details
       });
-      // Reset form
       setPlayerId('');
       setSecondaryPlayerId('');
       setDetails('');
@@ -46,40 +44,42 @@ export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent })
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#0e1628] border border-slate-700 w-full max-w-lg rounded-3xl p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl p-6 shadow-xl relative animate-in fade-in zoom-in duration-150">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center space-x-2">
-            <span className="text-2xl">⚽</span>
-            <h3 className="text-lg font-black text-white">Record Match Event</h3>
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">
+              <Activity size={16} />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">Record Match Event</h3>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           
-          {/* Quick Select Event Type */}
+          {/* Event Category Buttons */}
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Event Category</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase block mb-2">Event Category</label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'goal', label: '⚽ Goal', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' },
-                { id: 'save', label: '🧤 Save', color: 'bg-teal-500/20 text-teal-300 border-teal-500/40' },
-                { id: 'yellow_card', label: '🟨 Yellow', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' },
-                { id: 'red_card', label: '🟥 Red', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' },
-                { id: 'tackle', label: '🛡️ Tackle', color: 'bg-blue-500/20 text-blue-300 border-blue-500/40' },
-                { id: 'substitution', label: '🔄 Sub', color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' },
+                { id: 'goal', label: 'Goal', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                { id: 'save', label: 'Save', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+                { id: 'yellow_card', label: 'Yellow Card', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+                { id: 'red_card', label: 'Red Card', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+                { id: 'tackle', label: 'Tackle', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                { id: 'substitution', label: 'Substitution', color: 'bg-slate-100 text-slate-700 border-slate-200' },
               ].map(item => (
                 <button
                   type="button"
                   key={item.id}
                   onClick={() => setEventType(item.id)}
-                  className={`py-2 px-3 rounded-xl font-extrabold text-xs border text-center transition-all ${
-                    eventType === item.id ? `${item.color} shadow-lg ring-2 ring-emerald-500` : 'bg-slate-900/60 text-slate-400 border-slate-800'
+                  className={`py-2 px-3 rounded-lg font-semibold text-xs border text-center transition-all ${
+                    eventType === item.id ? `${item.color} ring-2 ring-emerald-600` : 'bg-slate-50 text-slate-600 border-slate-200'
                   }`}
                 >
                   {item.label}
@@ -90,27 +90,27 @@ export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent })
 
           {/* Minute Input */}
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Match Minute</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Match Minute</label>
             <input
               type="number"
               min="1"
               max="120"
               value={minute}
               onChange={(e) => setMinute(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
               required
             />
           </div>
 
           {/* Primary Player Selection */}
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase block mb-1">
-              {eventType === 'goal' ? '⚽ Goal Scorer' : eventType === 'substitution' ? 'Player Out' : 'Primary Player'}
+            <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">
+              {eventType === 'goal' ? 'Goal Scorer' : eventType === 'substitution' ? 'Player Out' : 'Primary Player'}
             </label>
             <select
               value={playerId}
               onChange={(e) => setPlayerId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
               required
             >
               <option value="">-- Select Player --</option>
@@ -122,18 +122,18 @@ export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent })
             </select>
           </div>
 
-          {/* Secondary Player Selection for Goal Assist / Sub In */}
+          {/* Secondary Player Selection */}
           {(eventType === 'goal' || eventType === 'substitution') && (
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-1">
-                {eventType === 'goal' ? '🎯 Assist Provider (Optional)' : 'Player In'}
+              <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">
+                {eventType === 'goal' ? 'Assist Provider (Optional)' : 'Player In'}
               </label>
               <select
                 value={secondaryPlayerId}
                 onChange={(e) => setSecondaryPlayerId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
               >
-                <option value="">{eventType === 'goal' ? 'None (Solo Goal / Unassisted)' : '-- Select Player In --'}</option>
+                <option value="">{eventType === 'goal' ? 'None (Solo Goal)' : '-- Select Player In --'}</option>
                 {allPlayers.filter(p => p._id !== playerId).map(p => (
                   <option key={p._id} value={p._id}>
                     {p.name} ({p.position})
@@ -143,26 +143,26 @@ export default function EventLoggerModal({ isOpen, onClose, match, onAddEvent })
             </div>
           )}
 
-          {/* Details / Reason */}
+          {/* Details / Notes */}
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Notes / Reason (Optional)</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Notes / Reason (Optional)</label>
             <input
               type="text"
-              placeholder="e.g. Header, Free-kick, Tactical foul"
+              placeholder="e.g. Header, Free kick, Tactical foul"
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-xs focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 text-xs focus:outline-none focus:border-emerald-600 focus:bg-white"
             />
           </div>
 
           {/* Submit Button */}
-          <div className="pt-3">
+          <div className="pt-2">
             <button
               type="submit"
               disabled={submitting || !playerId}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-extrabold py-3 rounded-xl text-sm uppercase tracking-wider shadow-lg hover:brightness-110 disabled:opacity-50 transition"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs uppercase tracking-wider shadow-sm disabled:opacity-50 transition-colors"
             >
-              {submitting ? 'Recording...' : 'RECORD EVENT'}
+              {submitting ? 'Recording...' : 'Record Match Event'}
             </button>
           </div>
 

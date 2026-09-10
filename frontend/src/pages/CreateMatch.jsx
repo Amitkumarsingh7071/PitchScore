@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { playerAPI, matchAPI } from '../services/api';
-import { PlusCircle, Users, Calendar, MapPin, Clock, ArrowRight, ArrowLeft, KeyRound, Share2, Copy, Check } from 'lucide-react';
+import { PlusCircle, Users, Calendar, ArrowRight, ArrowLeft, Share2, Copy, Check, Activity } from 'lucide-react';
 
 export default function CreateMatch() {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export default function CreateMatch() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-600"></div>
       </div>
     );
   }
@@ -101,31 +101,31 @@ export default function CreateMatch() {
   if (createdMatch) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12 space-y-6">
-        <div className="glass-panel p-8 rounded-3xl border-2 border-emerald-500/50 text-center space-y-6 shadow-2xl animate-in zoom-in duration-300">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-black flex items-center justify-center mx-auto text-3xl font-black shadow-xl">
-            ⚽
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-6 shadow-sm animate-in zoom-in duration-200">
+          <div className="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto text-2xl font-bold shadow-sm">
+            <Activity size={28} />
           </div>
 
-          <h2 className="text-2xl font-black text-white uppercase">MATCH CREATED SUCCESSFULLY!</h2>
+          <h2 className="text-xl font-bold text-slate-900">Match Created Successfully!</h2>
           
-          <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3">
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Share Match Code With Players</div>
+          <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-3">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Share Match Code With Players</div>
             
-            <div className="text-4xl font-black text-emerald-400 tracking-widest uppercase font-['Plus_Jakarta_Sans']">
+            <div className="text-3xl font-bold text-emerald-700 tracking-widest uppercase">
               {createdMatch.matchCode}
             </div>
 
-            <p className="text-xs text-slate-400">
-              Players can enter this code on the <span className="text-emerald-400 font-bold">Join Match</span> page to select their team!
+            <p className="text-xs text-slate-500">
+              Players can enter this code on the <span className="text-emerald-700 font-semibold">Join Match</span> page to select their team!
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={copyShareLink}
-                className="w-full sm:w-auto bg-slate-900 border border-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold text-white flex items-center justify-center space-x-2 hover:bg-slate-800"
+                className="w-full sm:w-auto bg-white border border-slate-200 px-4 py-2.5 rounded-lg text-xs font-semibold text-slate-700 flex items-center justify-center space-x-2 hover:bg-slate-50"
               >
-                {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
                 <span>{copied ? 'Link Copied!' : 'Copy Match Join Link'}</span>
               </button>
 
@@ -133,7 +133,7 @@ export default function CreateMatch() {
                 href={`https://wa.me/?text=${encodeURIComponent(`Join our football match at ${createdMatch.location}! Enter Match Code: ${createdMatch.matchCode} at ${window.location.origin}/join?code=${createdMatch.matchCode}`)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2"
+                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-lg text-xs flex items-center justify-center space-x-2"
               >
                 <Share2 size={16} />
                 <span>Share via WhatsApp</span>
@@ -143,9 +143,9 @@ export default function CreateMatch() {
 
           <button
             onClick={() => navigate(`/scoring/${createdMatch._id}`)}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-black py-4 rounded-2xl text-sm uppercase tracking-wider shadow-xl hover:brightness-110"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg text-xs uppercase tracking-wider shadow-sm transition-colors"
           >
-            OPEN MATCH ROOM & RECORD EVENTS →
+            Open Match Room & Record Events →
           </button>
         </div>
       </div>
@@ -153,33 +153,33 @@ export default function CreateMatch() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       
       {/* Header */}
-      <div className="border-b border-slate-800 pb-6 text-center">
-        <span className="inline-flex items-center space-x-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-black uppercase">
+      <div className="border-b border-slate-200 pb-5 text-center">
+        <span className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-semibold">
           <PlusCircle size={14} />
           <span>Match Setup Wizard</span>
         </span>
-        <h1 className="text-3xl font-black text-white mt-2">Create New Football Match</h1>
-        <p className="text-slate-400 text-xs mt-1">Set up venue details, generate a Match Join Code, and assign initial lineups</p>
+        <h1 className="text-2xl font-bold text-slate-900 mt-2">Create New Football Match</h1>
+        <p className="text-slate-500 text-xs mt-1">Set up match details, generate a Match Code, and assign initial lineups</p>
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-center space-x-4 text-xs font-black uppercase">
+      <div className="flex items-center justify-center space-x-4 text-xs font-semibold uppercase">
         <button
           onClick={() => setStep(1)}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition ${
-            step === 1 ? 'bg-emerald-500 text-black shadow' : 'bg-slate-800 text-slate-400'
+          className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
+            step === 1 ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'
           }`}
         >
           <span>1. Match Info</span>
         </button>
-        <span className="text-slate-600">→</span>
+        <span className="text-slate-300">→</span>
         <button
           onClick={() => setStep(2)}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition ${
-            step === 2 ? 'bg-emerald-500 text-black shadow' : 'bg-slate-800 text-slate-400'
+          className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
+            step === 2 ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'
           }`}
         >
           <span>2. Select Lineups</span>
@@ -188,69 +188,69 @@ export default function CreateMatch() {
 
       {/* STEP 1: MATCH INFO */}
       {step === 1 && (
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
-          <h2 className="text-lg font-black text-white flex items-center space-x-2 border-b border-slate-800 pb-3">
-            <Calendar className="text-emerald-400" size={20} />
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+          <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-3">
+            <Calendar className="text-emerald-600" size={18} />
             <span>Step 1 — Match Information</span>
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Match Date</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Match Date</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                 required
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Turf / Ground Name</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Venue / Ground Name</label>
               <input
                 type="text"
                 placeholder="e.g. City Football Turf"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                 required
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Match Duration (Minutes)</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Match Duration (Minutes)</label>
               <input
                 type="number"
                 min="30"
                 max="120"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                 required
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-400 uppercase block mb-1">Pre-Match Notes / Weather</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Notes / Weather</label>
               <input
                 type="text"
-                placeholder="e.g. Wet pitch evening match"
+                placeholder="e.g. Friendly evening match"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 text-xs focus:outline-none focus:border-emerald-600 focus:bg-white"
               />
             </div>
           </div>
 
-          <div className="pt-4 flex justify-end">
+          <div className="pt-2 flex justify-end">
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="bg-emerald-500 text-black font-extrabold px-6 py-3 rounded-2xl text-xs uppercase tracking-wider hover:brightness-110 flex items-center space-x-2"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg text-xs uppercase tracking-wider transition-colors flex items-center space-x-2"
             >
               <span>Next: Lineup Setup</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={15} />
             </button>
           </div>
         </div>
@@ -258,56 +258,56 @@ export default function CreateMatch() {
 
       {/* STEP 2: SELECT TEAMS */}
       {step === 2 && (
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h2 className="text-lg font-black text-white flex items-center space-x-2">
-              <Users className="text-emerald-400" size={20} />
-              <span>Step 2 — Assign Initial Player Lineups</span>
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <Users className="text-emerald-600" size={18} />
+              <span>Step 2 — Assign Lineups</span>
             </h2>
-            <span className="text-xs text-slate-400 font-bold">
+            <span className="text-xs text-slate-500 font-medium">
               Assigned: {teamAPlayerIds.length + teamBPlayerIds.length} Players
             </span>
           </div>
 
-          {/* Team Names Customization */}
+          {/* Team Names */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-rose-950/30 border border-rose-500/30 p-3 rounded-2xl">
-              <label className="text-[10px] font-bold text-rose-400 uppercase block mb-1">Team A Name</label>
+            <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl">
+              <label className="text-[10px] font-semibold text-rose-700 uppercase block mb-1">Team A Name</label>
               <input
                 type="text"
                 value={teamAName}
                 onChange={(e) => setTeamAName(e.target.value)}
-                className="w-full bg-slate-900 border border-rose-500/40 rounded-xl px-3 py-2 text-rose-300 font-extrabold text-sm focus:outline-none"
+                className="w-full bg-white border border-rose-200 rounded-lg px-3 py-2 text-rose-900 font-bold text-sm focus:outline-none"
               />
             </div>
 
-            <div className="bg-blue-950/30 border border-blue-500/30 p-3 rounded-2xl">
-              <label className="text-[10px] font-bold text-blue-400 uppercase block mb-1">Team B Name</label>
+            <div className="bg-blue-50 border border-blue-200 p-3 rounded-xl">
+              <label className="text-[10px] font-semibold text-blue-700 uppercase block mb-1">Team B Name</label>
               <input
                 type="text"
                 value={teamBName}
                 onChange={(e) => setTeamBName(e.target.value)}
-                className="w-full bg-slate-900 border border-blue-500/40 rounded-xl px-3 py-2 text-blue-300 font-extrabold text-sm focus:outline-none"
+                className="w-full bg-white border border-blue-200 rounded-lg px-3 py-2 text-blue-900 font-bold text-sm focus:outline-none"
               />
             </div>
           </div>
 
           {/* Roster Assignment List */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-slate-400 uppercase block">Select team for each player (or players can join using Match Code):</label>
+            <label className="text-xs font-semibold text-slate-500 uppercase block">Assign registered players:</label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">
               {players.map((p) => {
                 const isTeamA = teamAPlayerIds.includes(p._id);
                 const isTeamB = teamBPlayerIds.includes(p._id);
 
                 return (
-                  <div key={p._id} className="bg-slate-900/80 border border-slate-800 p-3 rounded-2xl flex items-center justify-between">
+                  <div key={p._id} className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <img src={p.profileImage} alt={p.name} className="w-10 h-10 rounded-xl object-cover border border-slate-700" />
+                      <img src={p.profileImage} alt={p.name} className="w-9 h-9 rounded-lg object-cover border border-slate-200" />
                       <div>
-                        <div className="font-bold text-white text-xs">{p.name}</div>
-                        <div className="text-[10px] text-slate-400">{p.position} • #{p.jerseyNumber}</div>
+                        <div className="font-bold text-slate-900 text-xs">{p.name}</div>
+                        <div className="text-[10px] text-slate-500">{p.position} • #{p.jerseyNumber}</div>
                       </div>
                     </div>
 
@@ -315,8 +315,8 @@ export default function CreateMatch() {
                       <button
                         type="button"
                         onClick={() => toggleTeamAPlayer(p._id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition ${
-                          isTeamA ? 'bg-rose-500 text-white shadow' : 'bg-slate-800 text-slate-400 hover:text-white'
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                          isTeamA ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                         }`}
                       >
                         Team A
@@ -324,8 +324,8 @@ export default function CreateMatch() {
                       <button
                         type="button"
                         onClick={() => toggleTeamBPlayer(p._id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition ${
-                          isTeamB ? 'bg-blue-500 text-white shadow' : 'bg-slate-800 text-slate-400 hover:text-white'
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                          isTeamB ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                         }`}
                       >
                         Team B
@@ -337,14 +337,14 @@ export default function CreateMatch() {
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="pt-4 flex items-center justify-between border-t border-slate-800">
+          {/* Actions */}
+          <div className="pt-3 flex items-center justify-between border-t border-slate-100">
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="bg-slate-800 text-slate-300 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-2"
+              className="bg-slate-100 text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs flex items-center space-x-1.5 hover:bg-slate-200"
             >
-              <ArrowLeft size={16} />
+              <ArrowLeft size={15} />
               <span>Back to Match Info</span>
             </button>
 
@@ -352,9 +352,9 @@ export default function CreateMatch() {
               type="button"
               onClick={handleCreateMatch}
               disabled={submitting}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-extrabold px-6 py-3 rounded-2xl text-xs uppercase tracking-wider shadow-lg hover:brightness-110 disabled:opacity-50"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg text-xs uppercase tracking-wider shadow-sm disabled:opacity-50 transition-colors"
             >
-              {submitting ? 'Creating Match...' : '⚽ CREATE MATCH & GENERATE CODE'}
+              {submitting ? 'Creating Match...' : 'Create Match & Generate Code'}
             </button>
           </div>
         </div>

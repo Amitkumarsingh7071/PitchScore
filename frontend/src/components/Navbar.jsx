@@ -14,7 +14,7 @@ import {
   Menu,
   X,
   Home,
-  Flame
+  Activity
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -34,70 +34,70 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#080d1a]/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl">
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
           {/* Brand Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-105 transition-transform">
-              <span className="text-2xl">⚽</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm font-bold">
+              <Activity size={20} />
             </div>
             <div>
-              <span className="font-black text-lg text-white tracking-wider block leading-none font-['Plus_Jakarta_Sans']">FOOTBALL</span>
-              <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest leading-tight block">MEMORY FC</span>
+              <span className="font-bold text-base text-slate-800 tracking-tight block leading-none">FOOTBALL</span>
+              <span className="text-[10px] text-emerald-600 font-semibold uppercase tracking-wider block">TRACKER</span>
             </div>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-all ${
+                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
                     isActive(link.path)
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-md shadow-emerald-500/10'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-emerald-50 text-emerald-700 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`}
                 >
-                  <Icon size={16} />
+                  <Icon size={15} />
                   <span>{link.label}</span>
                 </Link>
               );
             })}
-          </div>
+          </nav>
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             <Link
               to="/create-match"
-              className="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5"
+              className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-xs shadow-sm transition-colors"
             >
-              <PlusCircle size={16} />
+              <PlusCircle size={15} />
               <span>Create Match</span>
             </Link>
 
-            {/* Role indicator */}
-            <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs">
+            {/* Quick Role Switcher */}
+            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-1 text-xs">
               <button
                 onClick={quickLoginAdmin}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center space-x-1 ${
-                  isAdmin ? 'bg-amber-500 text-black shadow' : 'text-slate-400 hover:text-white'
+                className={`px-2.5 py-1 rounded-md font-medium transition-colors flex items-center space-x-1 ${
+                  isAdmin ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-800'
                 }`}
-                title="Switch to Host/Admin mode"
+                title="Switch to Host role"
               >
                 <ShieldAlert size={12} />
                 <span>Host</span>
               </button>
               <button
                 onClick={quickLoginPlayer}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center space-x-1 ${
-                  !isAdmin && user ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'
+                className={`px-2.5 py-1 rounded-md font-medium transition-colors flex items-center space-x-1 ${
+                  !isAdmin && user ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-800'
                 }`}
-                title="Switch to Player mode"
+                title="Switch to Player role"
               >
                 <UserCheck size={12} />
                 <span>Player</span>
@@ -107,7 +107,7 @@ export default function Navbar() {
             {user && (
               <button
                 onClick={logout}
-                className="p-2 text-slate-400 hover:text-rose-400 rounded-xl hover:bg-slate-800 transition"
+                className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
                 title="Logout"
               >
                 <LogOut size={16} />
@@ -115,28 +115,28 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu trigger */}
+          {/* Mobile menu button */}
           <div className="flex md:hidden items-center space-x-2">
             <Link
               to="/join"
-              className="bg-emerald-500 text-black p-2 rounded-xl font-bold flex items-center justify-center"
+              className="bg-emerald-600 text-white p-2 rounded-lg font-semibold flex items-center justify-center"
             >
-              <KeyRound size={18} />
+              <KeyRound size={16} />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-300 hover:text-white rounded-xl bg-slate-800"
+              className="p-2 text-slate-600 hover:text-slate-900 rounded-lg bg-slate-100"
             >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0c1324] border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
             return (
@@ -144,10 +144,10 @@ export default function Navbar() {
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm uppercase tracking-wider ${
+                className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
                   isActive(link.path)
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                    : 'text-slate-300 hover:bg-slate-800'
+                    ? 'bg-emerald-50 text-emerald-700 font-semibold'
+                    : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 <Icon size={18} />
@@ -160,13 +160,13 @@ export default function Navbar() {
             <Link
               to="/create-match"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full bg-emerald-500 text-black font-black py-3 rounded-2xl text-center block text-xs uppercase tracking-wider shadow"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-center block text-xs"
             >
-              + CREATE NEW MATCH
+              + Create New Match
             </Link>
           </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }

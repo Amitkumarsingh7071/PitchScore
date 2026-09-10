@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { matchAPI, playerAPI } from '../services/api';
-import { KeyRound, Users, CheckCircle2, Shield, ArrowRight, Share2, Copy, Check } from 'lucide-react';
+import { KeyRound, CheckCircle2, Share2, Copy, Check } from 'lucide-react';
 
 export default function JoinMatch() {
   const navigate = useNavigate();
@@ -58,12 +58,11 @@ export default function JoinMatch() {
 
     setLoading(true);
     try {
-      const res = await matchAPI.joinByCode({
+      await matchAPI.joinByCode({
         matchCode: matchData.match.matchCode,
         playerId: selectedPlayerId,
         team: selectedTeam
       });
-      // Navigate to match scoring/details view
       navigate(`/scoring/${matchData.match._id}`);
     } catch (err) {
       console.error(err);
@@ -84,20 +83,20 @@ export default function JoinMatch() {
   return (
     <div className="max-w-xl mx-auto px-4 py-8 space-y-6">
       
-      {/* Sporty Header */}
+      {/* Header */}
       <div className="text-center space-y-2">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20 text-black">
-          <KeyRound size={32} />
+        <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center mx-auto shadow-sm text-white">
+          <KeyRound size={24} />
         </div>
-        <h1 className="text-3xl font-black text-white tracking-tight uppercase">JOIN MATCH ROOM</h1>
-        <p className="text-slate-400 text-xs">
-          Enter the 6-character match code sent by your match host to enter the turf lobby
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Join Match Room</h1>
+        <p className="text-slate-500 text-xs">
+          Enter the 6-character match code provided by the match host to enter the squad lobby
         </p>
       </div>
 
-      {/* Code Input Box */}
-      <div className="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4 shadow-2xl">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block text-center">
+      {/* Code Input Card */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 block text-center">
           Enter Match Code
         </label>
 
@@ -107,55 +106,54 @@ export default function JoinMatch() {
             placeholder="e.g. FC-9482"
             value={matchCode}
             onChange={(e) => setMatchCode(e.target.value.toUpperCase())}
-            className="flex-1 bg-slate-950 border border-slate-700 rounded-2xl px-5 py-3.5 text-center font-black tracking-widest text-xl text-emerald-400 uppercase focus:outline-none focus:border-emerald-500 shadow-inner"
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-center font-bold tracking-widest text-lg text-emerald-700 uppercase focus:outline-none focus:border-emerald-600 focus:bg-white"
             maxLength={7}
           />
           <button
             type="button"
             onClick={() => handleLookupCode()}
             disabled={searching || !matchCode}
-            className="bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-6 py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg disabled:opacity-50 transition"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-3 rounded-xl text-xs uppercase tracking-wider shadow-sm disabled:opacity-50 transition-colors"
           >
-            {searching ? 'Finding...' : 'FIND MATCH'}
+            {searching ? 'Finding...' : 'Find Match'}
           </button>
         </div>
 
         {errorMsg && (
-          <div className="text-rose-400 text-xs font-bold text-center bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">
+          <div className="text-rose-600 text-xs font-semibold text-center bg-rose-50 p-3 rounded-lg border border-rose-200">
             {errorMsg}
           </div>
         )}
       </div>
 
-      {/* Match Lobby Preview & Team Selection */}
+      {/* Match Found & Team Selection */}
       {matchData && (
-        <form onSubmit={handleJoinMatch} className="glass-panel p-6 rounded-3xl border-2 border-emerald-500/40 space-y-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+        <form onSubmit={handleJoinMatch} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 animate-in fade-in zoom-in duration-150">
           
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-            <div className="text-xs font-bold text-slate-400">Match Found</div>
-            <div className="text-lg font-black text-white">
-              🔴 {matchData.match.teamA?.name} vs {matchData.match.teamB?.name} 🔵
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center space-y-1">
+            <div className="text-xs font-semibold text-slate-500">Match Found</div>
+            <div className="text-base font-bold text-slate-900">
+              {matchData.match.teamA?.name} vs {matchData.match.teamB?.name}
             </div>
-            <div className="text-xs text-emerald-400 font-bold">
-              📍 Turf: {matchData.match.location}
+            <div className="text-xs text-emerald-700 font-semibold">
+              Venue: {matchData.match.location}
             </div>
 
-            {/* Share Code bar */}
             <div className="pt-2 flex items-center justify-center space-x-2">
               <button
                 type="button"
                 onClick={copyShareLink}
-                className="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-[11px] text-slate-300 hover:text-white font-bold flex items-center space-x-1"
+                className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50 font-medium flex items-center space-x-1"
               >
-                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                 <span>{copied ? 'Link Copied!' : 'Copy Code Link'}</span>
               </button>
 
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`Join our football match on Football Memory! Enter Match Code: ${matchData.match.matchCode} at ${window.location.origin}/join?code=${matchData.match.matchCode}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`Join our football match! Enter Match Code: ${matchData.match.matchCode} at ${window.location.origin}/join?code=${matchData.match.matchCode}`)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center space-x-1"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1"
               >
                 <Share2 size={14} />
                 <span>Share via WhatsApp</span>
@@ -163,15 +161,14 @@ export default function JoinMatch() {
             </div>
           </div>
 
-          {/* Select Player Profile */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-1">
               Select Your Player Profile
             </label>
             <select
               value={selectedPlayerId}
               onChange={(e) => setSelectedPlayerId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white font-bold text-sm focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 font-medium text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
               required
             >
               {players.map(p => (
@@ -182,25 +179,23 @@ export default function JoinMatch() {
             </select>
           </div>
 
-          {/* Choose Team Red or Team Blue */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-              Select Your Side / Team
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-2">
+              Select Your Team
             </label>
 
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedTeam('teamA')}
-                className={`p-4 rounded-2xl border text-center transition-all ${
+                className={`p-3.5 rounded-xl border text-center transition-all ${
                   selectedTeam === 'teamA'
-                    ? 'bg-rose-950/80 border-rose-500 text-rose-300 ring-2 ring-rose-500 shadow-lg'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400'
+                    ? 'bg-rose-50 border-rose-300 text-rose-800 font-semibold ring-2 ring-rose-500'
+                    : 'bg-slate-50 border-slate-200 text-slate-600'
                 }`}
               >
-                <div className="text-xl mb-1">🔴</div>
-                <div className="font-black text-sm text-white">{matchData.match.teamA?.name || 'Team Red'}</div>
-                <div className="text-[10px] text-slate-400 mt-1">
+                <div className="font-bold text-sm">{matchData.match.teamA?.name || 'Team Red'}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">
                   {(matchData.match.teamA?.playerIds || []).length} Players Assigned
                 </div>
               </button>
@@ -208,29 +203,27 @@ export default function JoinMatch() {
               <button
                 type="button"
                 onClick={() => setSelectedTeam('teamB')}
-                className={`p-4 rounded-2xl border text-center transition-all ${
+                className={`p-3.5 rounded-xl border text-center transition-all ${
                   selectedTeam === 'teamB'
-                    ? 'bg-blue-950/80 border-blue-500 text-blue-300 ring-2 ring-blue-500 shadow-lg'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400'
+                    ? 'bg-blue-50 border-blue-300 text-blue-800 font-semibold ring-2 ring-blue-500'
+                    : 'bg-slate-50 border-slate-200 text-slate-600'
                 }`}
               >
-                <div className="text-xl mb-1">🔵</div>
-                <div className="font-black text-sm text-white">{matchData.match.teamB?.name || 'Team Blue'}</div>
-                <div className="text-[10px] text-slate-400 mt-1">
+                <div className="font-bold text-sm">{matchData.match.teamB?.name || 'Team Blue'}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">
                   {(matchData.match.teamB?.playerIds || []).length} Players Assigned
                 </div>
               </button>
             </div>
           </div>
 
-          {/* Action Button */}
           <button
             type="submit"
             disabled={loading || !selectedPlayerId}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-black py-4 rounded-2xl text-sm uppercase tracking-wider shadow-xl hover:brightness-110 disabled:opacity-50 transition flex items-center justify-center space-x-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs uppercase tracking-wider shadow-sm disabled:opacity-50 transition-colors flex items-center justify-center space-x-2"
           >
-            <CheckCircle2 size={20} />
-            <span>{loading ? 'Joining Room...' : 'ENTER MATCH ROOM & PLAY'}</span>
+            <CheckCircle2 size={18} />
+            <span>{loading ? 'Joining Room...' : 'Enter Match Room'}</span>
           </button>
 
         </form>

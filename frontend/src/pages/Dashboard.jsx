@@ -4,7 +4,7 @@ import { statsAPI } from '../services/api';
 import StatCard from '../components/StatCard';
 import MatchCard from '../components/MatchCard';
 import { useAuth } from '../context/AuthContext';
-import { Trophy, Target, Award, Star, Users, PlusCircle, Flame, ArrowRight, ShieldCheck, KeyRound } from 'lucide-react';
+import { Trophy, Target, Award, Star, Users, PlusCircle, ArrowRight, ShieldCheck, KeyRound, Activity } from 'lucide-react';
 
 export default function Dashboard() {
   const { isAdmin } = useAuth();
@@ -28,7 +28,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-600"></div>
       </div>
     );
   }
@@ -36,50 +36,47 @@ export default function Dashboard() {
   const { overall, recentMatches, leaderboardPreview } = data || {};
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
       {/* Hero Banner */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-950 via-[#0c1427] to-slate-950 border border-slate-800 p-6 md:p-10 shadow-2xl">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-4">
-            <Flame size={14} />
-            <span>Private Turf Match Tracker</span>
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-2xl space-y-3">
+          <div className="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
+            <Activity size={14} />
+            <span>Private Football Match & Stats Platform</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            FOOTBALL <span className="text-emerald-400">MEMORY FC</span>
+          <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+            Track Matches, Calculate Ratings & Build Player History
           </h1>
-          <p className="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed font-medium">
-            Record raw turf match events. Share Match Codes with friends to join room lineups, automatically calculate player ratings & Man of the Match, and preserve career stats forever!
+          <p className="text-slate-600 text-sm leading-relaxed">
+            Record raw turf match events. Share 6-digit match codes with friends, automatically derive match scores and player ratings, and maintain career leaderboards.
           </p>
           
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link
               to="/join"
-              className="bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black px-6 py-3.5 rounded-2xl text-sm shadow-xl shadow-emerald-500/20 hover:brightness-110 transition flex items-center space-x-2 uppercase tracking-wider"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg text-xs shadow-sm transition-colors flex items-center space-x-2"
             >
-              <KeyRound size={18} />
+              <KeyRound size={16} />
               <span>Join Match with Code</span>
             </Link>
 
             <Link
               to="/create-match"
-              className="bg-slate-900 hover:bg-slate-800 text-white font-black px-6 py-3.5 rounded-2xl text-sm border border-slate-700 transition flex items-center space-x-2 uppercase tracking-wider"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold px-5 py-2.5 rounded-lg text-xs border border-slate-200 transition-colors flex items-center space-x-2"
             >
-              <PlusCircle size={18} className="text-emerald-400" />
+              <PlusCircle size={16} className="text-emerald-600" />
               <span>Create New Match</span>
             </Link>
           </div>
         </div>
-
-        {/* Ambient Turf Grass Graphic */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Overall Group Metrics Grid */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
-          <ShieldCheck className="text-emerald-400" size={20} />
-          <span>Overall Group Turf Statistics</span>
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+          <ShieldCheck className="text-emerald-600" size={16} />
+          <span>Overall Group Statistics</span>
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -92,39 +89,39 @@ export default function Dashboard() {
       </section>
 
       {/* Recent Matches Section */}
-      <section className="space-y-4">
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
-            <span className="text-xl">⚽</span>
-            <span>Recent Turf Matches</span>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+            <Activity size={16} className="text-emerald-600" />
+            <span>Recent Matches</span>
           </h2>
-          <Link to="/history" className="text-xs font-black text-emerald-400 hover:text-emerald-300 flex items-center space-x-1 uppercase tracking-wider">
+          <Link to="/history" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center space-x-1">
             <span>View All Matches</span>
             <ArrowRight size={14} />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {recentMatches && recentMatches.length > 0 ? (
             recentMatches.map((match) => (
               <MatchCard key={match._id} match={match} isAdmin={isAdmin} />
             ))
           ) : (
-            <div className="col-span-full bg-slate-900/50 rounded-2xl p-8 text-center text-slate-400 border border-slate-800">
-              No completed turf matches found yet. Create a match to begin!
+            <div className="col-span-full bg-white rounded-xl p-8 text-center text-slate-500 border border-slate-200 shadow-sm text-sm">
+              No completed matches recorded yet. Click <strong>Create New Match</strong> above to host your first game!
             </div>
           )}
         </div>
       </section>
 
       {/* Leaderboard Preview Cards */}
-      <section className="space-y-4">
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
-            <Trophy className="text-amber-400" size={20} />
-            <span>Leaderboard Preview</span>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+            <Trophy className="text-amber-600" size={16} />
+            <span>Leaderboard Highlights</span>
           </h2>
-          <Link to="/leaderboards" className="text-xs font-black text-emerald-400 hover:text-emerald-300 flex items-center space-x-1 uppercase tracking-wider">
+          <Link to="/leaderboards" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center space-x-1">
             <span>Full Leaderboards</span>
             <ArrowRight size={14} />
           </Link>
@@ -132,48 +129,48 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           
-          <div className="glass-panel p-4 rounded-2xl border border-slate-800 flex items-center space-x-3">
-            <div className="text-2xl">⚽</div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">⚽</div>
             <div>
-              <div className="text-[10px] uppercase font-black text-slate-400">Top Scorer</div>
-              <div className="font-black text-white text-sm truncate">{leaderboardPreview?.topScorer?.player?.name || 'N/A'}</div>
-              <div className="text-xs text-emerald-400 font-extrabold">{leaderboardPreview?.topScorer?.goals || 0} Goals</div>
+              <div className="text-[10px] uppercase font-semibold text-slate-400">Top Scorer</div>
+              <div className="font-bold text-slate-900 text-sm truncate">{leaderboardPreview?.topScorer?.player?.name || 'N/A'}</div>
+              <div className="text-xs text-emerald-600 font-semibold">{leaderboardPreview?.topScorer?.goals || 0} Goals</div>
             </div>
           </div>
 
-          <div className="glass-panel p-4 rounded-2xl border border-slate-800 flex items-center space-x-3">
-            <div className="text-2xl">🎯</div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">🎯</div>
             <div>
-              <div className="text-[10px] uppercase font-black text-slate-400">Top Assists</div>
-              <div className="font-black text-white text-sm truncate">{leaderboardPreview?.topAssists?.player?.name || 'N/A'}</div>
-              <div className="text-xs text-teal-400 font-extrabold">{leaderboardPreview?.topAssists?.assists || 0} Assists</div>
+              <div className="text-[10px] uppercase font-semibold text-slate-400">Top Assists</div>
+              <div className="font-bold text-slate-900 text-sm truncate">{leaderboardPreview?.topAssists?.player?.name || 'N/A'}</div>
+              <div className="text-xs text-blue-600 font-semibold">{leaderboardPreview?.topAssists?.assists || 0} Assists</div>
             </div>
           </div>
 
-          <div className="glass-panel p-4 rounded-2xl border border-slate-800 flex items-center space-x-3">
-            <div className="text-2xl">🏆</div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">🏆</div>
             <div>
-              <div className="text-[10px] uppercase font-black text-slate-400">Most MOTM</div>
-              <div className="font-black text-white text-sm truncate">{leaderboardPreview?.mostMotm?.player?.name || 'N/A'}</div>
-              <div className="text-xs text-amber-400 font-extrabold">{leaderboardPreview?.mostMotm?.motmCount || 0} MOTMs</div>
+              <div className="text-[10px] uppercase font-semibold text-slate-400">Most MOTM</div>
+              <div className="font-bold text-slate-900 text-sm truncate">{leaderboardPreview?.mostMotm?.player?.name || 'N/A'}</div>
+              <div className="text-xs text-amber-600 font-semibold">{leaderboardPreview?.mostMotm?.motmCount || 0} MOTMs</div>
             </div>
           </div>
 
-          <div className="glass-panel p-4 rounded-2xl border border-slate-800 flex items-center space-x-3">
-            <div className="text-2xl">⭐</div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">⭐</div>
             <div>
-              <div className="text-[10px] uppercase font-black text-slate-400">Highest Rating</div>
-              <div className="font-black text-white text-sm truncate">{leaderboardPreview?.highestAvgRating?.player?.name || 'N/A'}</div>
-              <div className="text-xs text-amber-400 font-extrabold">{leaderboardPreview?.highestAvgRating?.averageRating || 0} Avg ⭐</div>
+              <div className="text-[10px] uppercase font-semibold text-slate-400">Highest Rating</div>
+              <div className="font-bold text-slate-900 text-sm truncate">{leaderboardPreview?.highestAvgRating?.player?.name || 'N/A'}</div>
+              <div className="text-xs text-amber-600 font-semibold">{leaderboardPreview?.highestAvgRating?.averageRating || 0} Avg ⭐</div>
             </div>
           </div>
 
-          <div className="glass-panel p-4 rounded-2xl border border-slate-800 flex items-center space-x-3">
-            <div className="text-2xl">✅</div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center font-bold">✅</div>
             <div>
-              <div className="text-[10px] uppercase font-black text-slate-400">Most Wins</div>
-              <div className="font-black text-white text-sm truncate">{leaderboardPreview?.mostWins?.player?.name || 'N/A'}</div>
-              <div className="text-xs text-emerald-400 font-extrabold">{leaderboardPreview?.mostWins?.wins || 0} Wins</div>
+              <div className="text-[10px] uppercase font-semibold text-slate-400">Most Wins</div>
+              <div className="font-bold text-slate-900 text-sm truncate">{leaderboardPreview?.mostWins?.player?.name || 'N/A'}</div>
+              <div className="text-xs text-emerald-600 font-semibold">{leaderboardPreview?.mostWins?.wins || 0} Wins</div>
             </div>
           </div>
 
