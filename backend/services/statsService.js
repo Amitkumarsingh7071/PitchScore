@@ -4,6 +4,13 @@ import Player from '../models/Player.js';
 import { calculatePlayerMatchRating } from './ratingService.js';
 import { selectManOfTheMatch } from './motmService.js';
 
+const getCleanId = (item) => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  if (item._id) return item._id.toString();
+  return item.toString();
+};
+
 export const calculateMatchDetails = async (matchId) => {
   const match = await Match.findById(matchId).populate('teamA.playerIds teamB.playerIds');
   if (!match) throw new Error('Match not found');
@@ -13,12 +20,12 @@ export const calculateMatchDetails = async (matchId) => {
   let scoreA = 0;
   let scoreB = 0;
 
-  const teamAPlayerIds = (match.teamA.playerIds || []).map(p => p._id.toString());
-  const teamBPlayerIds = (match.teamB.playerIds || []).map(p => p._id.toString());
+  const teamAPlayerIds = (match.teamA?.playerIds || []).filter(Boolean).map(p => getCleanId(p));
+  const teamBPlayerIds = (match.teamB?.playerIds || []).filter(Boolean).map(p => getCleanId(p));
 
   events.forEach(e => {
-    if (e.type === 'goal') {
-      const scorerId = e.playerId.toString();
+    if (e.type === 'goal' && e.playerId) {
+      const scorerId = getCleanId(e.playerId);
       if (teamAPlayerIds.includes(scorerId)) scoreA += 1;
       else if (teamBPlayerIds.includes(scorerId)) scoreB += 1;
     }
@@ -37,14 +44,15 @@ export const calculateMatchDetails = async (matchId) => {
   }
 
   const getPlayerMinutes = (pId, playerMinutesArray, duration = 90) => {
-    const record = (playerMinutesArray || []).find(m => m.playerId && m.playerId.toString() === pId.toString());
+    const pStr = getCleanId(pId);
+    const record = (playerMinutesArray || []).find(m => m.playerId && getCleanId(m.playerId) === pStr);
     return record ? record.minutesPlayed : duration;
   };
 
   const playerPerformances = [];
 
-  (match.teamA.playerIds || []).forEach(player => {
-    const mins = getPlayerMinutes(player._id, match.teamA.playerMinutes, match.duration);
+  (match.teamA?.playerIds || []).filter(Boolean).forEach(player => {
+    const mins = getPlayerMinutes(player._id || player, match.teamA.playerMinutes, match.duration);
     const perf = calculatePlayerMatchRating({
       player,
       events,
@@ -62,8 +70,8 @@ export const calculateMatchDetails = async (matchId) => {
     });
   });
 
-  (match.teamB.playerIds || []).forEach(player => {
-    const mins = getPlayerMinutes(player._id, match.teamB.playerMinutes, match.duration);
+  (match.teamB?.playerIds || []).filter(Boolean).forEach(player => {
+    const mins = getPlayerMinutes(player._id || player, match.teamB.playerMinutes, match.duration);
     const perf = calculatePlayerMatchRating({
       player,
       events,
@@ -82,7 +90,7 @@ export const calculateMatchDetails = async (matchId) => {
   });
 
   const motm = selectManOfTheMatch(playerPerformances);
-  const motmPlayerId = motm ? motm.player._id : null;
+  const motmPlayerId = motm ? (motm.player._id || motm.player) : null;
 
   return {
     match,
@@ -96,9 +104,6 @@ export const calculateMatchDetails = async (matchId) => {
   };
 };
 
-/**
- * Calculates dynamic career stats and CricHeroes-style achievement badges for a player.
- */
 export const calculatePlayerCareerStats = async (playerId) => {
   const player = await Player.findById(playerId);
   if (!player) throw new Error('Player not found');
@@ -132,7 +137,7 @@ export const calculatePlayerCareerStats = async (playerId) => {
     const details = await calculateMatchDetails(match._id);
     
     const perf = details.playerPerformances.find(
-      p => p.player._id.toString() === playerId.toString()
+      p => getCleanId(p.player) === playerId.toString()
     );
 
     if (perf) {
@@ -152,7 +157,7 @@ export const calculatePlayerCareerStats = async (playerId) => {
       if (matchAssists > maxAssistsInSingleMatch) maxAssistsInSingleMatch = matchAssists;
       if (matchSaves > maxSavesInSingleMatch) maxSavesInSingleMatch = matchSaves;
 
-      if (details.motmPlayerId && details.motmPlayerId.toString() === playerId.toString()) {
+      if (details.motmPlayerId && getCleanId(details.motmPlayerId) === playerId.toString()) {
         motmCount += 1;
       }
 
@@ -172,7 +177,7 @@ export const calculatePlayerCareerStats = async (playerId) => {
         result: perf.result,
         rating: perf.rating,
         stats: perf.stats,
-        isMotm: details.motmPlayerId && details.motmPlayerId.toString() === playerId.toString()
+        isMotm: details.motmPlayerId && getCleanId(details.motmPlayerId) === playerId.toString()
       });
 
       performanceTrend.push({
@@ -190,7 +195,6 @@ export const calculatePlayerCareerStats = async (playerId) => {
   const assistsPerMatch = matchesPlayed > 0 ? Number((assists / matchesPlayed).toFixed(2)) : 0;
   const winPercentage = matchesPlayed > 0 ? Number(((wins / matchesPlayed) * 100).toFixed(1)) : 0;
 
-  // Compute CricHeroes-style Badges
   const badges = [];
   if (maxGoalsInSingleMatch >= 3) {
     badges.push({ id: 'hat_trick', icon: '🎩', title: 'Hat-Trick Hero', desc: 'Scored 3+ goals in a single match' });
@@ -293,7 +297,7 @@ export const calculateDashboardStats = async () => {
       score: details.score,
       status: match.status,
       motm: details.motm ? {
-        _id: details.motm.player._id,
+        _id: details.motm.player._id || details.motm.player,
         name: details.motm.player.name,
         rating: details.motm.rating
       } : null,

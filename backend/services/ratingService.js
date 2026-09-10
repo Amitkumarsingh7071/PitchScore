@@ -1,20 +1,15 @@
 import { RATING_WEIGHTS } from '../config/ratingWeights.js';
 
-/**
- * Calculates dynamic match rating for a player based purely on match events, position, minutes, and team result.
- * 
- * @param {Object} params
- * @param {Object} params.player - Player document (position, name, etc.)
- * @param {Array} params.events - Array of MatchEvent documents for this match
- * @param {Number} params.minutesPlayed - Minutes played by this player in the match (default duration if not subbed)
- * @param {Number} params.totalMatchDuration - Total match duration (e.g. 90)
- * @param {String} params.result - 'WIN' | 'DRAW' | 'LOSS'
- * @param {Number} params.teamGoalsConceded - Goals conceded by player's team
- * @returns {Object} { rawScore, rating, stats }
- */
+const getCleanId = (item) => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  if (item._id) return item._id.toString();
+  return item.toString();
+};
+
 export const calculatePlayerMatchRating = ({
   player,
-  events,
+  events = [],
   minutesPlayed = 90,
   totalMatchDuration = 90,
   result = 'DRAW',
@@ -22,8 +17,8 @@ export const calculatePlayerMatchRating = ({
 }) => {
   const position = player.position || 'Midfielder';
   const posBonus = RATING_WEIGHTS.POSITION_BONUSES[position] || {};
+  const playerStr = getCleanId(player);
 
-  // Count events for this player
   let goals = 0;
   let assists = 0;
   let keyPasses = 0;
@@ -35,12 +30,12 @@ export const calculatePlayerMatchRating = ({
   let redCards = 0;
 
   events.forEach(e => {
-    const isPrimary = e.playerId && e.playerId.toString() === player._id.toString();
-    const isSecondaryAssister = e.secondaryPlayerId && e.secondaryPlayerId.toString() === player._id.toString();
+    const isPrimary = e.playerId && getCleanId(e.playerId) === playerStr;
+    const isSecondaryAssister = e.secondaryPlayerId && getCleanId(e.secondaryPlayerId) === playerStr;
 
     if (e.type === 'goal' && isPrimary) goals += 1;
     if (e.type === 'assist' && isPrimary) assists += 1;
-    if (e.type === 'goal' && isSecondaryAssister) assists += 1; // Also count if secondary on goal event
+    if (e.type === 'goal' && isSecondaryAssister) assists += 1;
     if (e.type === 'key_pass' && isPrimary) keyPasses += (e.value || 1);
     if (e.type === 'tackle' && isPrimary) tackles += (e.value || 1);
     if (e.type === 'interception' && isPrimary) interceptions += (e.value || 1);
@@ -50,7 +45,6 @@ export const calculatePlayerMatchRating = ({
     if (e.type === 'red_card' && isPrimary) redCards += 1;
   });
 
-  // Calculate position-adjusted raw score
   const goalPts = goals * (RATING_WEIGHTS.GOAL * (posBonus.GOAL || 1.0));
   const assistPts = assists * (RATING_WEIGHTS.ASSIST * (posBonus.ASSIST || 1.0));
   const keyPassPts = keyPasses * (RATING_WEIGHTS.KEY_PASS * (posBonus.KEY_PASS || 1.0));
@@ -88,19 +82,13 @@ export const calculatePlayerMatchRating = ({
     concededPenaltyPts + 
     resultPts;
 
-  // Rating scaling logic:
-  // Base rating is 6.0 for normal solid performance.
-  // Add rawScore * 0.75
   let baseRating = RATING_WEIGHTS.BASE_RATING + (rawScore * 0.75);
 
-  // Minutes played modifier (smoothly dampen ratings for very low minutes unless extreme contribution)
   const minRatio = Math.min(1.0, Math.max(0.1, minutesPlayed / totalMatchDuration));
   if (minRatio < 0.3) {
-    // Bring rating closer to 6.0 for short appearances
     baseRating = 6.0 + (baseRating - 6.0) * (minRatio / 0.3);
   }
 
-  // Clamp rating between 1.0 and 10.0
   const finalRating = Math.max(RATING_WEIGHTS.MIN_RATING, Math.min(RATING_WEIGHTS.MAX_RATING, baseRating));
 
   return {
