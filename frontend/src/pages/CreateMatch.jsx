@@ -12,6 +12,7 @@ export default function CreateMatch() {
   // Form State
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [location, setLocation] = useState('City Football Turf');
+  const [matchFormat, setMatchFormat] = useState('11v11');
   const [duration, setDuration] = useState(90);
   const [notes, setNotes] = useState('');
 
@@ -217,6 +218,21 @@ export default function CreateMatch() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                 required
               />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Match Format / Team Size</label>
+              <select
+                value={matchFormat}
+                onChange={(e) => setMatchFormat(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 font-semibold text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
+              >
+                <option value="5v5">5v5 (Futsal / Turf)</option>
+                <option value="7v7">7v7 (Mini Pitch)</option>
+                <option value="8v8">8v8 (Medium Field)</option>
+                <option value="9v9">9v9 (Youth Ground)</option>
+                <option value="11v11">11v11 (Full Pitch Standard)</option>
+              </select>
             </div>
 
             <div>

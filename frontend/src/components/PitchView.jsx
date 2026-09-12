@@ -25,7 +25,7 @@ export default function PitchView({ teamA, teamB, playerPerformances, motmPlayer
         </h4>
 
         {lines.map((line, idx) => (
-          <div key={idx} className="flex justify-around items-center px-4 min-h-[44px]">
+          <div key={idx} className="flex flex-wrap justify-center sm:justify-around items-center gap-2 px-2 min-h-[44px]">
             {line.map(player => {
               const rating = getPlayerRating(player._id);
               const isMotm = motmPlayerId && motmPlayerId.toString() === player._id.toString();
