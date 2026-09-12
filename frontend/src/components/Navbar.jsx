@@ -81,6 +81,17 @@ export default function Navbar() {
               <span>Create Match</span>
             </Link>
 
+            {user && (
+              <Link
+                to="/admin"
+                className="flex items-center space-x-1 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold px-3 py-2 rounded-lg text-xs transition-colors"
+                title="Admin Console & User Analytics"
+              >
+                <ShieldAlert size={14} className="text-amber-600" />
+                <span>Admin Console</span>
+              </Link>
+            )}
+
             {/* User Account / Sign In Status */}
             {user ? (
               <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs">

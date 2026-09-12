@@ -16,6 +16,8 @@ import Leaderboards from './pages/Leaderboards';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
+import AdminDashboard from './pages/AdminDashboard';
+
 export default function App() {
   return (
     <AuthProvider>
@@ -25,6 +27,7 @@ export default function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/join" element={<JoinMatch />} />
