@@ -4,7 +4,7 @@ import { statsAPI } from '../services/api';
 import StatCard from '../components/StatCard';
 import MatchCard from '../components/MatchCard';
 import { useAuth } from '../context/AuthContext';
-import { Trophy, Target, Award, Star, Users, PlusCircle, ArrowRight, ShieldCheck, KeyRound, Activity } from 'lucide-react';
+import { Trophy, Target, Award, Star, Users, PlusCircle, ArrowRight, ShieldCheck, KeyRound, Activity, UserCheck, ShieldAlert } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth();
@@ -33,7 +33,7 @@ export default function Dashboard() {
     );
   }
 
-  const { overall, recentMatches, leaderboardPreview } = data || {};
+  const { overall, recentMatches, leaderboardPreview, adminAnalytics } = data || {};
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -72,6 +72,93 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* ADMIN CONSOLE: USER ANALYTICS PANEL (Visible to Admin Users) */}
+      {(isAdmin || user?.role === 'ADMIN') && (
+        <section className="bg-slate-900 text-white rounded-2xl p-6 shadow-md space-y-5 border border-slate-800">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div className="flex items-center space-x-2">
+              <ShieldAlert className="text-amber-400" size={20} />
+              <h2 className="text-base font-bold tracking-tight">Admin Console — Live User Analytics</h2>
+            </div>
+            <span className="bg-amber-400/10 text-amber-400 border border-amber-400/30 text-[10px] uppercase font-bold px-2.5 py-1 rounded-full">
+              System Admin Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-slate-800/80 border border-slate-700 p-4 rounded-xl flex items-center justify-between">
+              <div>
+                <div className="text-[11px] text-slate-400 uppercase font-semibold">Registered User Accounts</div>
+                <div className="text-2xl font-black text-white mt-1">{adminAnalytics?.totalUserAccounts || overall?.totalUserAccounts || 0}</div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                <UserCheck size={20} />
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 border border-slate-700 p-4 rounded-xl flex items-center justify-between">
+              <div>
+                <div className="text-[11px] text-slate-400 uppercase font-semibold">Active Player Profiles</div>
+                <div className="text-2xl font-black text-white mt-1">{overall?.totalPlayers || 0}</div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                <Users size={20} />
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 border border-slate-700 p-4 rounded-xl flex items-center justify-between">
+              <div>
+                <div className="text-[11px] text-slate-400 uppercase font-semibold">Matches Hosted</div>
+                <div className="text-2xl font-black text-white mt-1">{overall?.totalMatches || 0}</div>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                <Trophy size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Registered Users Table */}
+          {adminAnalytics?.recentRegisteredUsers && adminAnalytics.recentRegisteredUsers.length > 0 && (
+            <div className="space-y-3 pt-2">
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Recent Registered User Accounts ({adminAnalytics.recentRegisteredUsers.length})
+              </div>
+
+              <div className="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-800 text-slate-400 border-b border-slate-700 uppercase text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-4">User Name</th>
+                      <th className="py-2.5 px-4">Email Address</th>
+                      <th className="py-2.5 px-4">Role</th>
+                      <th className="py-2.5 px-4 text-right">Joined Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700/50 text-slate-200">
+                    {adminAnalytics.recentRegisteredUsers.map((u) => (
+                      <tr key={u._id} className="hover:bg-slate-800/80">
+                        <td className="py-2.5 px-4 font-bold">{u.name}</td>
+                        <td className="py-2.5 px-4 text-slate-400">{u.email}</td>
+                        <td className="py-2.5 px-4">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            u.role === 'ADMIN' ? 'bg-amber-400/20 text-amber-300' : 'bg-emerald-400/20 text-emerald-300'
+                          }`}>
+                            {u.role}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-4 text-right text-slate-400">
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Overall Group Metrics Grid */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
@@ -79,9 +166,10 @@ export default function Dashboard() {
           <span>Overall Group Statistics</span>
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <StatCard title="Total Matches" value={overall?.totalMatches || 0} icon={Trophy} color="emerald" />
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <StatCard title="User Accounts" value={overall?.totalUserAccounts || 0} icon={UserCheck} color="emerald" />
           <StatCard title="Active Players" value={overall?.totalPlayers || 0} icon={Users} color="blue" />
+          <StatCard title="Total Matches" value={overall?.totalMatches || 0} icon={Trophy} color="emerald" />
           <StatCard title="Total Goals" value={overall?.totalGoals || 0} icon={Target} color="rose" />
           <StatCard title="Total Assists" value={overall?.totalAssists || 0} icon={Award} color="purple" />
           <StatCard title="Total MOTMs" value={overall?.totalMotm || 0} icon={Star} color="amber" />

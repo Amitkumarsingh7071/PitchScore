@@ -1,6 +1,7 @@
 import Match from '../models/Match.js';
 import MatchEvent from '../models/MatchEvent.js';
 import Player from '../models/Player.js';
+import User from '../models/User.js';
 import { calculatePlayerMatchRating } from './ratingService.js';
 import { selectManOfTheMatch } from './motmService.js';
 
@@ -269,6 +270,12 @@ export const calculateLeaderboards = async () => {
 export const calculateDashboardStats = async () => {
   const totalMatches = await Match.countDocuments({ status: 'FINISHED' });
   const totalPlayers = await Player.countDocuments();
+  const totalUserAccounts = await User.countDocuments();
+  const recentRegisteredUsers = await User.find()
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .select('-password');
+
   const finishedMatches = await Match.find({ status: 'FINISHED' }).sort({ date: -1 });
 
   let totalGoals = 0;
@@ -311,9 +318,16 @@ export const calculateDashboardStats = async () => {
     overall: {
       totalMatches,
       totalPlayers,
+      totalUserAccounts,
       totalGoals,
       totalAssists,
       totalMotm
+    },
+    adminAnalytics: {
+      totalUserAccounts,
+      totalPlayers,
+      totalMatches,
+      recentRegisteredUsers
     },
     recentMatches: matchSummaries.slice(0, 5),
     leaderboardPreview: {
