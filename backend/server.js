@@ -51,12 +51,6 @@ app.get('*', (req, res, next) => {
 const startServer = async () => {
   await connectDB();
 
-  // Auto-seed if database has no users
-  const userCount = await User.countDocuments();
-  if (userCount === 0) {
-    await seedDatabase();
-  }
-
   app.listen(PORT, () => {
     console.log(`⚽ PitchScore Backend API running on port ${PORT}`);
   });

@@ -37,10 +37,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // Quick helper to switch role mode for demo/testing
-  const quickLoginAdmin = () => login('admin@footfriend.com', 'admin123');
-  const quickLoginPlayer = () => login('player@footfriend.com', 'player123');
-
   const isAdmin = user?.role === 'ADMIN';
 
   return (
@@ -50,9 +46,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAdmin,
         login,
-        logout,
-        quickLoginAdmin,
-        quickLoginPlayer
+        logout
       }}
     >
       {children}

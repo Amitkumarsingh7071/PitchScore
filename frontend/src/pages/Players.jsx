@@ -166,7 +166,7 @@ export default function Players() {
                 <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Full Name</label>
                 <input
                   type="text"
-                  placeholder="e.g. Amit Singh"
+                  placeholder="e.g. Player Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"

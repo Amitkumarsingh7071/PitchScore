@@ -81,7 +81,7 @@ export default function FinishMatchModal({ isOpen, onClose, onFinishMatch }) {
             </label>
             <input
               type="text"
-              placeholder="e.g. Amit scored a last-minute hat-trick winner!"
+              placeholder="e.g. Scored a last-minute hat-trick winner!"
               value={bestMoment}
               onChange={(e) => setBestMoment(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 text-xs focus:outline-none focus:border-emerald-600 focus:bg-white"
@@ -92,7 +92,7 @@ export default function FinishMatchModal({ isOpen, onClose, onFinishMatch }) {
             <label className="text-xs font-semibold text-amber-700 uppercase block mb-1">Funny / Memorable Moment</label>
             <input
               type="text"
-              placeholder="e.g. Suresh accidentally kicked his shoe into the net!"
+              placeholder="e.g. Goalkeeper accidentally kicked his shoe into the net!"
               value={funnyMoment}
               onChange={(e) => setFunnyMoment(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 text-xs focus:outline-none focus:border-emerald-600 focus:bg-white"

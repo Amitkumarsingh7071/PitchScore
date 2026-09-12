@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { Trophy, Target, Award, Star, Users, PlusCircle, ArrowRight, ShieldCheck, KeyRound, Activity } from 'lucide-react';
 
 export default function Dashboard() {
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +43,7 @@ export default function Dashboard() {
         <div className="max-w-2xl space-y-3">
           <div className="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
             <Activity size={14} />
-            <span>Welcome to PitchScore</span>
+            <span>{user ? `Welcome back, ${user.name}!` : 'Welcome to PitchScore'}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight">
             PitchScore — Local Football Match Scorer & Stats Tracker
