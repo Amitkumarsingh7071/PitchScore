@@ -10,7 +10,7 @@ const generateToken = (id) => {
 };
 
 export const registerUser = async (req, res) => {
-  const { name, email, password, role, position, jerseyNumber, bio, profileImage } = req.body;
+  const { name, email, password, position, jerseyNumber, bio, profileImage } = req.body;
 
   try {
     const userExists = await User.findOne({ email: email.toLowerCase() });
@@ -21,11 +21,19 @@ export const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Strictly enforce ADMIN role assignment only for authorized admin email
+    const adminEmails = [
+      'singhamitk7071@gmail.com',
+      (process.env.ADMIN_EMAIL || '').toLowerCase()
+    ].filter(Boolean);
+
+    const assignedRole = adminEmails.includes(email.toLowerCase()) ? 'ADMIN' : 'PLAYER';
+
     const user = await User.create({
       name,
       email: email.toLowerCase(),
       password: hashedPassword,
-      role: role || 'PLAYER'
+      role: assignedRole
     });
 
     // Auto-create associated Player Profile
@@ -60,6 +68,17 @@ export const loginUser = async (req, res) => {
   try {
     let user = await User.findOne({ email: email.toLowerCase() }).populate('playerId');
     if (user && (await bcrypt.compare(password, user.password))) {
+
+      // Ensure designated admin email always retains ADMIN status
+      const adminEmails = [
+        'singhamitk7071@gmail.com',
+        (process.env.ADMIN_EMAIL || '').toLowerCase()
+      ].filter(Boolean);
+
+      if (adminEmails.includes(user.email.toLowerCase()) && user.role !== 'ADMIN') {
+        user.role = 'ADMIN';
+        await user.save();
+      }
 
       // Auto-heal missing player profile for older accounts
       if (!user.playerId) {
