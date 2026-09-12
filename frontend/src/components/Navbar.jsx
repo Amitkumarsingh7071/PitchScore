@@ -81,7 +81,7 @@ export default function Navbar() {
               <span>Create Match</span>
             </Link>
 
-            {user && (
+            {user && user.role === 'ADMIN' && (
               <Link
                 to="/admin"
                 className="flex items-center space-x-1 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold px-3 py-2 rounded-lg text-xs transition-colors"

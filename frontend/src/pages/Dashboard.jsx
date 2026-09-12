@@ -73,7 +73,7 @@ export default function Dashboard() {
       </div>
 
       {/* ADMIN CONSOLE: USER ANALYTICS PANEL (Visible to Admin Users) */}
-      {(isAdmin || user?.role === 'ADMIN') && (
+      {user && user.role === 'ADMIN' && (
         <section className="bg-slate-900 text-white rounded-2xl p-6 shadow-md space-y-5 border border-slate-800">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div className="flex items-center space-x-2">

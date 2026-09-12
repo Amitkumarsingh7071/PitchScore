@@ -31,6 +31,23 @@ export default function AdminDashboard() {
     );
   }
 
+  if (!user || user.role !== 'ADMIN') {
+    return (
+      <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+          <ShieldAlert size={28} />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">Admin Authorization Required</h2>
+        <p className="text-slate-500 text-xs leading-relaxed">
+          The Admin Console & User Analytics panel is restricted strictly to Administrator accounts. Please sign in with an Admin account to access system metrics.
+        </p>
+        <Link to="/" className="inline-block bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-lg text-xs transition-colors">
+          Return to Home Dashboard
+        </Link>
+      </div>
+    );
+  }
+
   const { overall, adminAnalytics } = data || {};
   const usersList = adminAnalytics?.recentRegisteredUsers || [];
 
