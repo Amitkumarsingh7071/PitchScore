@@ -110,13 +110,23 @@ export const createMatch = async (req, res) => {
 };
 
 export const joinMatchByCode = async (req, res) => {
-  const { matchCode, playerId, team } = req.body; // team: 'teamA' | 'teamB'
+  const { matchCode, playerId, newPlayerName, position, jerseyNumber, team } = req.body; // team: 'teamA' | 'teamB'
 
   try {
     const match = await Match.findOne({ matchCode: matchCode.toUpperCase() });
     if (!match) return res.status(404).json({ message: 'Invalid Match Code' });
 
-    const player = await Player.findById(playerId);
+    let player;
+    if (playerId) {
+      player = await Player.findById(playerId);
+    } else if (newPlayerName) {
+      player = await Player.create({
+        name: newPlayerName.trim(),
+        position: position || 'Midfielder',
+        jerseyNumber: Number(jerseyNumber) || Math.floor(Math.random() * 90) + 1
+      });
+    }
+
     if (!player) return res.status(404).json({ message: 'Player profile not found' });
 
     const pIdStr = player._id.toString();

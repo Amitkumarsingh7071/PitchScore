@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { matchAPI, playerAPI } from '../services/api';
-import { KeyRound, CheckCircle2, Share2, Copy, Check } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { KeyRound, CheckCircle2, Share2, Copy, Check, UserPlus, UserCheck } from 'lucide-react';
 
 export default function JoinMatch() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const initialCode = searchParams.get('code') || '';
 
   const [matchCode, setMatchCode] = useState(initialCode);
   const [matchData, setMatchData] = useState(null);
   const [players, setPlayers] = useState([]);
+  
+  // Selection mode: 'EXISTING' or 'NEW'
+  const [mode, setMode] = useState('EXISTING');
   const [selectedPlayerId, setSelectedPlayerId] = useState('');
+  const [newPlayerName, setNewPlayerName] = useState('');
+  const [position, setPosition] = useState('Forward');
   const [selectedTeam, setSelectedTeam] = useState('teamA');
+  
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -23,7 +31,17 @@ export default function JoinMatch() {
       try {
         const res = await playerAPI.getAll();
         setPlayers(res.data);
-        if (res.data.length > 0) setSelectedPlayerId(res.data[0]._id);
+
+        // Pre-select logged in user's player profile if available
+        if (user && user.playerId) {
+          const userPId = typeof user.playerId === 'object' ? user.playerId._id : user.playerId;
+          setSelectedPlayerId(userPId);
+          setMode('EXISTING');
+        } else if (res.data.length > 0) {
+          setSelectedPlayerId(res.data[0]._id);
+        } else {
+          setMode('NEW');
+        }
       } catch (err) {
         console.error(err);
       }
@@ -33,7 +51,7 @@ export default function JoinMatch() {
     if (initialCode) {
       handleLookupCode(initialCode);
     }
-  }, [initialCode]);
+  }, [initialCode, user]);
 
   const handleLookupCode = async (codeToSearch) => {
     const code = codeToSearch || matchCode;
@@ -54,19 +72,29 @@ export default function JoinMatch() {
 
   const handleJoinMatch = async (e) => {
     e.preventDefault();
-    if (!selectedPlayerId || !matchData) return;
+    if (!matchData) return;
+    if (mode === 'EXISTING' && !selectedPlayerId) return;
+    if (mode === 'NEW' && !newPlayerName.trim()) return;
 
     setLoading(true);
     try {
-      await matchAPI.joinByCode({
+      const payload = {
         matchCode: matchData.match.matchCode,
-        playerId: selectedPlayerId,
         team: selectedTeam
-      });
+      };
+
+      if (mode === 'EXISTING') {
+        payload.playerId = selectedPlayerId;
+      } else {
+        payload.newPlayerName = newPlayerName.trim();
+        payload.position = position;
+      }
+
+      await matchAPI.joinByCode(payload);
       navigate(`/scoring/${matchData.match._id}`);
     } catch (err) {
       console.error(err);
-      alert('Failed to join match');
+      alert(err.response?.data?.message || 'Failed to join match');
     } finally {
       setLoading(false);
     }
@@ -126,7 +154,7 @@ export default function JoinMatch() {
         )}
       </div>
 
-      {/* Match Found & Team Selection */}
+      {/* Match Found & Player Selection */}
       {matchData && (
         <form onSubmit={handleJoinMatch} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 animate-in fade-in zoom-in duration-150">
           
@@ -161,24 +189,87 @@ export default function JoinMatch() {
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-1">
-              Select Your Player Profile
+          {/* Player Selection Mode Toggle */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 block">
+              Player Setup
             </label>
-            <select
-              value={selectedPlayerId}
-              onChange={(e) => setSelectedPlayerId(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 font-medium text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
-              required
-            >
-              {players.map(p => (
-                <option key={p._id} value={p._id}>
-                  {p.name} ({p.position}) — #{p.jerseyNumber}
-                </option>
-              ))}
-            </select>
+            
+            <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setMode('EXISTING')}
+                className={`py-2 rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                  mode === 'EXISTING' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-600'
+                }`}
+              >
+                <UserCheck size={14} />
+                <span>Select Profile</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMode('NEW')}
+                className={`py-2 rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                  mode === 'NEW' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-600'
+                }`}
+              >
+                <UserPlus size={14} />
+                <span>Join as New Player</span>
+              </button>
+            </div>
           </div>
 
+          {mode === 'EXISTING' ? (
+            <div>
+              <select
+                value={selectedPlayerId}
+                onChange={(e) => setSelectedPlayerId(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 font-medium text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
+                required
+              >
+                {players.length === 0 ? (
+                  <option value="">No player profiles found — Switch to 'Join as New Player'</option>
+                ) : (
+                  players.map(p => (
+                    <option key={p._id} value={p._id}>
+                      {p.name} ({p.position}) — #{p.jerseyNumber}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <div>
+                <label className="text-[11px] font-semibold text-slate-500 uppercase block mb-1">Your Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Leo Messi"
+                  value={newPlayerName}
+                  onChange={(e) => setNewPlayerName(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 text-xs font-semibold focus:outline-none focus:border-emerald-600"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-slate-500 uppercase block mb-1">Position</label>
+                <select
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 text-xs font-semibold focus:outline-none focus:border-emerald-600"
+                >
+                  <option value="Forward">Forward</option>
+                  <option value="Midfielder">Midfielder</option>
+                  <option value="Defender">Defender</option>
+                  <option value="Goalkeeper">Goalkeeper</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Team Choice */}
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-2">
               Select Your Team
@@ -219,7 +310,7 @@ export default function JoinMatch() {
 
           <button
             type="submit"
-            disabled={loading || !selectedPlayerId}
+            disabled={loading || (mode === 'EXISTING' && !selectedPlayerId) || (mode === 'NEW' && !newPlayerName.trim())}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs uppercase tracking-wider shadow-sm disabled:opacity-50 transition-colors flex items-center justify-center space-x-2"
           >
             <CheckCircle2 size={18} />

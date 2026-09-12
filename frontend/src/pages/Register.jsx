@@ -9,7 +9,8 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('PLAYER');
+  const [position, setPosition] = useState('Forward');
+  const [jerseyNumber, setJerseyNumber] = useState(10);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -18,7 +19,14 @@ export default function Register() {
     setLoading(true);
     setErrorMsg('');
     try {
-      const res = await authAPI.register({ name, email, password, role });
+      const res = await authAPI.register({ 
+        name, 
+        email, 
+        password, 
+        role: 'PLAYER', 
+        position, 
+        jerseyNumber: Number(jerseyNumber) 
+      });
       localStorage.setItem('footfriend_token', res.data.token);
       window.location.href = '/';
     } catch (err) {
@@ -37,9 +45,9 @@ export default function Register() {
         <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center mx-auto shadow-sm text-white">
           <Activity size={24} />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create Your Account</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create Player Account</h1>
         <p className="text-slate-500 text-xs">
-          Join your group football tracker, track match career stats and leaderboards
+          Set up your player profile, track match career stats, ratings and leaderboards
         </p>
       </div>
 
@@ -58,7 +66,7 @@ export default function Register() {
             <label className="text-xs font-semibold text-slate-600 uppercase block mb-1">Full Name</label>
             <input
               type="text"
-              placeholder="e.g. Rahul Sharma"
+              placeholder="e.g. Alex Morgan"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
@@ -70,7 +78,7 @@ export default function Register() {
             <label className="text-xs font-semibold text-slate-600 uppercase block mb-1">Email Address</label>
             <input
               type="email"
-              placeholder="e.g. rahul@example.com"
+              placeholder="e.g. alex@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
@@ -91,16 +99,33 @@ export default function Register() {
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-slate-600 uppercase block mb-1">Account Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
-            >
-              <option value="PLAYER">Player (Join & View Stats)</option>
-              <option value="ADMIN">Match Host (Create & Record Matches)</option>
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-slate-600 uppercase block mb-1">Position</label>
+              <select
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
+              >
+                <option value="Forward">Forward</option>
+                <option value="Midfielder">Midfielder</option>
+                <option value="Defender">Defender</option>
+                <option value="Goalkeeper">Goalkeeper</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-slate-600 uppercase block mb-1">Jersey #</label>
+              <input
+                type="number"
+                min="1"
+                max="99"
+                value={jerseyNumber}
+                onChange={(e) => setJerseyNumber(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
+                required
+              />
+            </div>
           </div>
 
           <button
@@ -109,7 +134,7 @@ export default function Register() {
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs uppercase tracking-wider shadow-sm transition-colors flex items-center justify-center space-x-1.5"
           >
             <UserPlus size={16} />
-            <span>{loading ? 'Creating Account...' : 'Create Account'}</span>
+            <span>{loading ? 'Creating Account...' : 'Create Account & Join PitchScore'}</span>
           </button>
         </form>
 
